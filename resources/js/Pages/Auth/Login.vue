@@ -1,46 +1,28 @@
 <template>
-    <Head title="Log in" />
+    <div class="head">
+    <p>This is nuestro reproductor motherfuckers</p>
+    </div>
+    <div class="container">
 
-    <jet-authentication-card>
-        <template #logo>
-            <jet-authentication-card-logo />
-        </template>
+        <div class="login-container">
+            <h1>Inicia Sesión</h1>
+            <form class="">
+                <label for="username">Email</label>
+                <input type="text" placeholder="Email">
 
-        <jet-validation-errors class="mb-4" />
+                <label for="password">Contraseña</label>
+                <input type="password" placeholder="Contraseña">
 
-        <div v-if="status" class="mb-4 font-medium text-sm text-green-600">
-            {{ status }}
-        </div>
+                <input type="submit" value="Login">
 
-        <form @submit.prevent="submit">
-            <div>
-                <jet-label for="email" value="Email" />
-                <jet-input id="email" type="email" class="mt-1 block w-full" v-model="form.email" required autofocus />
-            </div>
-
-            <div class="mt-4">
-                <jet-label for="password" value="Password" />
-                <jet-input id="password" type="password" class="mt-1 block w-full" v-model="form.password" required autocomplete="current-password" />
-            </div>
-
-            <div class="block mt-4">
-                <label class="flex items-center">
-                    <jet-checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ml-2 text-sm text-gray-600">Remember me</span>
-                </label>
-            </div>
-
-            <div class="flex items-center justify-end mt-4">
-                <Link v-if="canResetPassword" :href="route('password.request')" class="underline text-sm text-gray-600 hover:text-gray-900">
-                    Forgot your password?
+                <Link :href="route('register')" class="underline text-sm text-gray-600 hover:text-gray-900">
+                    ¿No tienes cuenta?
                 </Link>
 
-                <jet-button class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
-                    Log in
-                </jet-button>
-            </div>
-        </form>
-    </jet-authentication-card>
+
+            </form>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -95,3 +77,85 @@
         }
     }
 </script>
+
+<style scoped>
+.head{
+    width: 100%;
+    height: 10%;
+    background-color: #000;
+}
+
+.head p{
+    color: #fff;
+    text-align: center;
+}
+
+.container{
+    height: 100%;
+    width: 100%;
+    background-color: #fff;
+
+
+
+}
+
+.login-container{
+    height: 520px;
+    width: 420px;
+    background: #000;
+    color: #fff;
+    top: 50%;
+    left: 50%;
+    position: fixed;
+    transform: translate(-50%, -50%);
+    box-sizing: border-box;
+    border-radius: 5%;
+    padding: 70px 30px;
+}
+
+.login-container h1{
+    margin: 0;
+    padding: 0 0 50px;
+    text-align: center;
+    font-size: 22px;
+}
+
+.login-container label{
+    margin: 0;
+    padding: 0;
+    font-weight: bold;
+    display: block;
+}
+
+.login-container input{
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+.login-container input[type="text"],
+.login-container input[type="password"]{
+    border: none;
+    border-bottom: 1px solid #fff;
+    background: transparent;
+    outline: none;
+    height: 40px;
+    color: #fff;
+    font-size: 16px;
+}
+
+.login-container input[type="submit"]{
+    outline: none;
+    border: none;
+    height: 40px;
+    color: black;
+    border-radius: 20px;
+}
+
+.login-container link{
+    color: darkgray;
+}
+
+.login-container a:hover{
+    color: #ffffff;
+}
+</style>
