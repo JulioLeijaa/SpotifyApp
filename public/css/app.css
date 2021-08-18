@@ -1175,6 +1175,9 @@ select {
 .-mt-px {
 	margin-top: -1px;
 }
+.ml-8 {
+	margin-left: 2rem;
+}
 .block {
 	display: block;
 }
@@ -1220,17 +1223,14 @@ select {
 .h-screen {
 	height: 100vh;
 }
-.h-4\/5 {
-	height: 80%;
-}
-.h-1\/5 {
-	height: 20%;
-}
 .h-5\/6 {
 	height: 83.333333%;
 }
 .h-1\/6 {
 	height: 16.666667%;
+}
+.h-full {
+	height: 100%;
 }
 .min-h-screen {
 	min-height: 100vh;
@@ -1276,18 +1276,6 @@ select {
 }
 .w-20 {
 	width: 5rem;
-}
-.w-2\/6 {
-	width: 33.333333%;
-}
-.w-4\/6 {
-	width: 66.666667%;
-}
-.w-3\/12 {
-	width: 25%;
-}
-.w-9\/12 {
-	width: 75%;
 }
 .w-2\/12 {
 	width: 16.666667%;
@@ -1364,9 +1352,6 @@ select {
 .grid-cols-1 {
 	grid-template-columns: repeat(1, minmax(0, 1fr));
 }
-.grid-rows-2 {
-	grid-template-rows: repeat(2, minmax(0, 1fr));
-}
 .flex-row {
 	flex-direction: row;
 }
@@ -1411,12 +1396,6 @@ select {
 	--tw-space-y-reverse: 0;
 	margin-top: calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));
 	margin-bottom: calc(1.5rem * var(--tw-space-y-reverse));
-}
-.place-self-start {
-	place-self: start;
-}
-.place-self-end {
-	place-self: end;
 }
 .overflow-hidden {
 	overflow: hidden;
@@ -1552,6 +1531,18 @@ select {
 	--tw-bg-opacity: 1;
 	background-color: rgba(229, 231, 235, var(--tw-bg-opacity));
 }
+.bg-yellow-300 {
+	--tw-bg-opacity: 1;
+	background-color: rgba(252, 211, 77, var(--tw-bg-opacity));
+}
+.bg-gray-400 {
+	--tw-bg-opacity: 1;
+	background-color: rgba(156, 163, 175, var(--tw-bg-opacity));
+}
+.bg-gray-900 {
+	--tw-bg-opacity: 1;
+	background-color: rgba(17, 24, 39, var(--tw-bg-opacity));
+}
 .bg-opacity-25 {
 	--tw-bg-opacity: 0.25;
 }
@@ -1620,6 +1611,14 @@ select {
 .py-10 {
 	padding-top: 2.5rem;
 	padding-bottom: 2.5rem;
+}
+.px-10 {
+	padding-left: 2.5rem;
+	padding-right: 2.5rem;
+}
+.px-5 {
+	padding-left: 1.25rem;
+	padding-right: 1.25rem;
 }
 .pt-6 {
 	padding-top: 1.5rem;
@@ -1693,11 +1692,21 @@ select {
 	font-size: 1.25rem;
 	line-height: 1.75rem;
 }
+.text-9xl {
+	font-size: 8rem;
+	line-height: 1;
+}
 .font-medium {
 	font-weight: 500;
 }
 .font-semibold {
 	font-weight: 600;
+}
+.font-bold {
+	font-weight: 700;
+}
+.font-normal {
+	font-weight: 400;
 }
 .uppercase {
 	text-transform: uppercase;
@@ -1787,6 +1796,14 @@ select {
 .text-gray-300 {
 	--tw-text-opacity: 1;
 	color: rgba(209, 213, 219, var(--tw-text-opacity));
+}
+.text-gray-50 {
+	--tw-text-opacity: 1;
+	color: rgba(249, 250, 251, var(--tw-text-opacity));
+}
+.text-gray-100 {
+	--tw-text-opacity: 1;
+	color: rgba(243, 244, 246, var(--tw-text-opacity));
 }
 .underline {
 	text-decoration: underline;

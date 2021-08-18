@@ -5,7 +5,7 @@
             <content class="w-10/12" />
         </div>
         <div class="h-1/6 ">
-            <h1>Abajo</h1>
+            <music-player class="bg-gray-900 w-full h-full" />
         </div>
     </div>
     <!-- <app-layout title="Dashboard" >
@@ -41,5 +41,22 @@
             Content,
             MusicPlayer,
         },
+        // data() {
+        //     return {
+        //         songs: [
+        //                 {
+        //                     id: 0,
+        //                     title: "Wow",
+        //                     artist: "Post Malone",
+        //                     album: "",
+        //                     url:
+        //                     "https://res.cloudinary.com/dmf10fesn/video/upload/v1548882863/audio/Post_Malone_-_Wow._playvk.com.mp3",
+        //                     img:
+        //                     "https://res.cloudinary.com/dmf10fesn/image/upload/v1548884701/audio/album%20arts/s-l300.jpg"
+        //                 }
+        //             ],
+        //         },
+        //     }
+        // }
     }
 </script>

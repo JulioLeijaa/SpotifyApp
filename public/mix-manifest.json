@@ -1,4 +1,24 @@
 {
     "/js/app.js": "/js/app.js",
-    "/css/app.css": "/css/app.css"
+    "/css/app.css": "/css/app.css",
+    "/music/AnotherOneBitesTheDust.jpg": "/music/AnotherOneBitesTheDust.jpg",
+    "/music/AnotherOneBitesTheDust.mp3": "/music/AnotherOneBitesTheDust.mp3",
+    "/music/Desvelado.jpg": "/music/Desvelado.jpg",
+    "/music/Desvelado.mp3": "/music/Desvelado.mp3",
+    "/music/LoseControl.jpg": "/music/LoseControl.jpg",
+    "/music/LoseControl.mp3": "/music/LoseControl.mp3",
+    "/music/MeEstasTentando.mp3": "/music/MeEstasTentando.mp3",
+    "/music/MeEstasTentando.PNG": "/music/MeEstasTentando.PNG",
+    "/music/PamPam.jpg": "/music/PamPam.jpg",
+    "/music/PamPam.mp3": "/music/PamPam.mp3",
+    "/music/Perdoname.jpg": "/music/Perdoname.jpg",
+    "/music/Perdoname.mp3": "/music/Perdoname.mp3",
+    "/music/Rockstar.jpg": "/music/Rockstar.jpg",
+    "/music/Rockstar.mp3": "/music/Rockstar.mp3",
+    "/music/Supalonely.mp3": "/music/Supalonely.mp3",
+    "/music/Supalonely.png": "/music/Supalonely.png",
+    "/music/TeVas.jpg": "/music/TeVas.jpg",
+    "/music/TeVas.mp3": "/music/TeVas.mp3",
+    "/music/YoSeQueTeAcordaras.jpg": "/music/YoSeQueTeAcordaras.jpg",
+    "/music/YoSeQueTeAcordaras.mp3": "/music/YoSeQueTeAcordaras.mp3"
 }
