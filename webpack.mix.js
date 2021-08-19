@@ -23,4 +23,4 @@ if (mix.inProduction()) {
 }
 
 mix.copyDirectory('resources/music', 'public/music');
-// mix.copyDirectory('resources/assets', 'public/assets');
+mix.copyDirectory('resources/assets', 'public/assets');
