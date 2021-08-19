@@ -1178,6 +1178,12 @@ select {
 .-mt-px {
 	margin-top: -1px;
 }
+.mr-6 {
+	margin-right: 1.5rem;
+}
+.mr-4 {
+	margin-right: 1rem;
+}
 .block {
 	display: block;
 }
@@ -1229,16 +1235,11 @@ select {
 .h-1\/6 {
 	height: 16.666667%;
 }
-<<<<<<< HEAD
 .h-full {
 	height: 100%;
-=======
-.h-24 {
-	height: 6rem;
 }
 .h-1 {
 	height: 0.25rem;
->>>>>>> 38b226e9ec287956a61e3c71279632af05ede8c8
 }
 .min-h-screen {
 	min-height: 100vh;
@@ -1563,9 +1564,6 @@ select {
 .p-6 {
 	padding: 1.5rem;
 }
-.p-1 {
-	padding: 0.25rem;
-}
 .p-4 {
 	padding: 1rem;
 }
@@ -1701,19 +1699,13 @@ select {
 	font-size: 1.25rem;
 	line-height: 1.75rem;
 }
-<<<<<<< HEAD
 .text-9xl {
 	font-size: 8rem;
 	line-height: 1;
-=======
+}
 .text-4xl {
 	font-size: 2.25rem;
 	line-height: 2.5rem;
-}
-.text-3xl {
-	font-size: 1.875rem;
-	line-height: 2.25rem;
->>>>>>> 38b226e9ec287956a61e3c71279632af05ede8c8
 }
 .font-medium {
 	font-weight: 500;
@@ -1724,15 +1716,12 @@ select {
 .font-bold {
 	font-weight: 700;
 }
-<<<<<<< HEAD
-=======
 .font-extrabold {
 	font-weight: 800;
 }
 .font-thin {
 	font-weight: 100;
 }
->>>>>>> 38b226e9ec287956a61e3c71279632af05ede8c8
 .uppercase {
 	text-transform: uppercase;
 }
