@@ -1,11 +1,19 @@
 <template>
     <Head title="Log in" />
-    <div class="head">
-        <p>This is nuestro reproductor motherfuckers</p>
+
+    <div class="contenedor flex">
+        <header class="cont-header flex">
+            <div class="logo">
+                <img src="/assets/spotify-logo.svg" class="image" />
+            </div>
+
+            <div class="flex">
+                <Link :href="route('login')">
+                    Spotify
+                </Link>
+            </div>
+        </header>
     </div>
-
-    <jet-authentication-card>
-
 
         <jet-validation-errors class="mb-4" />
 
@@ -14,7 +22,7 @@
         </div>
 
         <form @submit.prevent="submit" class="login-container">
-            <h1>Inicia Sesión</h1>
+            <h1>Inicia sesión.</h1>
             <div>
                 <jet-label for="email" value="Email" class="email-label"/>
                 <jet-input id="email" type="email" class="mt-1 block w-full" v-model="form.email" required autofocus placeholder="Email"/>
@@ -33,7 +41,7 @@
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <Link v-if="canResetPassword" :href="route('register')" class="underline text-sm text-gray-600 hover:text-gray-900">
+                <Link :href="route('register')" class="underline text-sm text-gray-600 hover:text-gray-900">
                     ¿No tienes cuenta?
                 </Link>
 
@@ -42,7 +50,7 @@
                 </jet-button>
             </div>
         </form>
-    </jet-authentication-card>
+
 </template>
 
 
@@ -100,15 +108,28 @@
 </script>
 
 <style scoped>
-.head{
-    width: 100%;
-    height: 10%;
-    background-color: #000;
+
+.flex{
+    display: flex;
+    font-size: 30px;
 }
 
-.head p{
-    color: #fff;
-    text-align: center;
+.logo{
+    width: 5%;
+    padding: 5px;
+    justify-content: center;
+
+}
+
+.cont-header{
+    border-bottom: 1px solid #d9dadc;
+    padding: 25px 0 10px;
+    justify-content: center;
+    width: 100%;
+}
+
+header{
+    position:fixed;
 }
 
 .login-container{
