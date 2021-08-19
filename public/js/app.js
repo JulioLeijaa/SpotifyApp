@@ -21276,7 +21276,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  name: 'Content'
+  name: "Content"
 });
 
 /***/ }),
@@ -25185,13 +25185,17 @@ __webpack_require__.r(__webpack_exports__);
 (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-7ba85733");
 
 var _hoisted_1 = {
-  "class": "content"
+  "class": "content flex flex-col"
 };
+
+var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"header h-20 w-full flex flex-row-reverse items-center\" data-v-7ba85733><div class=\"logout h-1\" data-v-7ba85733><p data-v-7ba85733>Cerrar sesión</p></div><div class=\"line\" data-v-7ba85733></div><h1 class=\"m-4 font-bold text-header\" data-v-7ba85733>Premium</h1><h1 class=\"m-4 font-bold text-header\" data-v-7ba85733>Ayuda</h1><h1 class=\"m-4 font-bold text-header\" data-v-7ba85733>Descargar</h1></div><div class=\"info flex flex-col\" data-v-7ba85733><div class=\"info-title m-4\" data-v-7ba85733><h1 class=\"font-extrabold text-4xl\" data-v-7ba85733>Buenas noches</h1></div><div class=\"info-songs m-4\" data-v-7ba85733><div class=\"info-wrap-song\" data-v-7ba85733><div class=\"info-wrap-img\" data-v-7ba85733><img src=\"\" alt=\"image\" srcset=\"\" data-v-7ba85733></div><div class=\"info-song-text p-4 flex items-center\" data-v-7ba85733><h1 class=\"font-semibold color-white\" data-v-7ba85733>Name song</h1></div></div><div class=\"info-wrap-song\" data-v-7ba85733><div class=\"info-wrap-img\" data-v-7ba85733><img src=\"\" alt=\"image\" srcset=\"\" data-v-7ba85733></div><div class=\"info-song-text p-4 flex items-center\" data-v-7ba85733><h1 class=\"font-semibold color-white\" data-v-7ba85733>Name song</h1></div></div><div class=\"info-wrap-song\" data-v-7ba85733><div class=\"info-wrap-img\" data-v-7ba85733><img src=\"\" alt=\"image\" srcset=\"\" data-v-7ba85733></div><div class=\"info-song-text p-4 flex items-center\" data-v-7ba85733><h1 class=\"font-semibold color-white\" data-v-7ba85733>Name song</h1></div></div><div class=\"info-wrap-song\" data-v-7ba85733><div class=\"info-wrap-img\" data-v-7ba85733><img src=\"\" alt=\"image\" srcset=\"\" data-v-7ba85733></div><div class=\"info-song-text p-4 flex items-center\" data-v-7ba85733><h1 class=\"font-semibold color-white\" data-v-7ba85733>Name song</h1></div></div></div></div><div class=\"songs flex flex-col\" data-v-7ba85733><div class=\"info-title m-4\" data-v-7ba85733><h1 class=\"font-extrabold text-2xl\" data-v-7ba85733> Reproducido recientemente </h1></div><div class=\"list-songs m-4\" data-v-7ba85733><div class=\"wrap-song\" data-v-7ba85733><div class=\"wrap-img-song\" data-v-7ba85733><img src=\"\" alt=\"image\" srcset=\"\" data-v-7ba85733></div><div class=\"wrap-text-song\" data-v-7ba85733><h1 class=\"font-semibold color-white\" data-v-7ba85733>Name song</h1><p class=\"font-thin color-white\" data-v-7ba85733>Yeahhh Yeah</p></div></div></div></div>", 3);
+
+var _hoisted_5 = [_hoisted_2];
 
 (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)();
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1);
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, _hoisted_5);
 }
 
 /***/ }),
@@ -26820,7 +26824,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.content[data-v-7ba85733]{\r\n    background-color: blue;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.color-white[data-v-7ba85733] {\r\n    color: #ffffff;\n}\n.content[data-v-7ba85733] {\r\n    background: rgb(5, 91, 83);\r\n    background: linear-gradient(\r\n        180deg,\r\n        rgba(5, 91, 83, 1) 0%,\r\n        rgba(18, 18, 18, 1) 49%,\r\n        rgba(18, 18, 18, 1) 100%\r\n    );\r\n    overflow-y: auto;\n}\n.logout[data-v-7ba85733] {\r\n    align-items: center;\r\n    background-color: rgba(0, 0, 0, 0.7);\r\n    border: 0;\r\n    border-radius: 23px;\r\n    color: #fff;\r\n    cursor: pointer;\r\n    display: flex;\r\n    gap: 8px;\r\n    height: 32px;\r\n    justify-content: center;\r\n    -webkit-margin-start: 16px;\r\n            margin-inline-start: 16px;\r\n    min-width: 32px;\r\n    padding: 2px 10px;\r\n    position: relative;\r\n    margin: 16px;\n}\n.logout[data-v-7ba85733]:hover {\r\n    background-color: #282828;\n}\n.line[data-v-7ba85733] {\r\n    background: #fff;\r\n    height: 25px;\r\n    margin: 16px;\r\n    width: 1px;\n}\n.text-header[data-v-7ba85733] {\r\n    color: #ffffff;\n}\n.text-header[data-v-7ba85733]:hover {\r\n    transform: scale(1.04);\n}\n.info[data-v-7ba85733] {\r\n    margin-bottom: 16px;\r\n    min-height: 224px;\r\n    position: relative;\n}\n.info-title[data-v-7ba85733] {\r\n    color: #ffffff;\n}\n.info-songs[data-v-7ba85733] {\r\n    display: grid;\r\n    grid-auto-rows: auto;\r\n    grid-template-rows: 1fr;\r\n    overflow-y: hidden;\r\n    grid-gap: 24px;\r\n    grid-template-columns: repeat(4, 1fr);\n}\n.info-wrap-song[data-v-7ba85733] {\r\n    background-color: rgba(255, 255, 255, 0.1);\r\n    border-radius: 4px;\r\n    height: 80px;\r\n    position: relative;\r\n    transition: background-color 0.3s ease;\r\n    display: flex;\r\n    -webkit-user-select: none;\r\n       -moz-user-select: none;\r\n        -ms-user-select: none;\r\n            user-select: none;\n}\n.info-wrap-song[data-v-7ba85733]:hover {\r\n    background: rgba(255, 255, 255, 0.2);\n}\n.info-wrap-img[data-v-7ba85733] {\r\n    min-height: 80px;\r\n    min-width: 80px;\n}\n.info-wrap-img img[data-v-7ba85733] {\r\n    width: 100%;\r\n    height: 100%;\n}\n.list-songs[data-v-7ba85733] {\r\n    display: grid;\r\n    grid-gap: 24px;\r\n    grid-template-columns: repeat(6, 1fr);\r\n    grid-auto-rows: 0;\r\n    grid-template-rows: 1fr;\r\n    overflow-y: hidden;\n}\n.wrap-song[data-v-7ba85733] {\r\n    -webkit-box-flex: 1;\r\n    background: #181818;\r\n    border-radius: 4px;\r\n    flex: 1;\r\n    isolation: isolate;\r\n    padding: 16px;\r\n    position: relative;\r\n    transition: background-color 0.3s ease;\r\n    width: 100%;\n}\n.wrap-song[data-v-7ba85733]:hover{\r\n    background: #282828;\n}\n.wrap-img-song[data-v-7ba85733]{\r\n    margin-bottom: 16px;\r\n    position: relative;\n}\n.wrap-text-song[data-v-7ba85733]{\r\n    min-height: 62px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
