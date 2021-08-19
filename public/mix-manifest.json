@@ -22,5 +22,13 @@
     "/music/YoSeQueTeAcordaras.jpg": "/music/YoSeQueTeAcordaras.jpg",
     "/music/YoSeQueTeAcordaras.mp3": "/music/YoSeQueTeAcordaras.mp3",
     "/assets/Corazon.png": "/assets/Corazon.png",
-    "/assets/CorazonColoreado.png": "/assets/CorazonColoreado.png"
+    "/assets/CorazonColoreado.png": "/assets/CorazonColoreado.png",
+    "/assets/Pause.png": "/assets/Pause.png",
+    "/assets/Play.png": "/assets/Play.png",
+    "/assets/Repeat.png": "/assets/Repeat.png",
+    "/assets/RepeatActivado.png": "/assets/RepeatActivado.png",
+    "/assets/SkipBackward.png": "/assets/SkipBackward.png",
+    "/assets/SkipForward.png": "/assets/SkipForward.png",
+    "/assets/Suffle.png": "/assets/Suffle.png",
+    "/assets/SuffleActivado.png": "/assets/SuffleActivado.png"
 }
