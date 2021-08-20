@@ -33,6 +33,10 @@
     "/assets/spotify-logo.svg": "/assets/spotify-logo.svg",
     "/assets/spotify.png": "/assets/spotify.png",
     "/assets/Suffle.png": "/assets/Suffle.png",
+<<<<<<< HEAD
+    "/assets/SuffleActivado.png": "/assets/SuffleActivado.png"
+=======
     "/assets/SuffleActivado.png": "/assets/SuffleActivado.png",
     "/assets/Volume.png": "/assets/Volume.png"
+>>>>>>> 3177e50732f29942c7f418f4ae0452bddb9f6b78
 }

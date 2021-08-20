@@ -15,30 +15,32 @@
         </header>
     </div>
 
+    <jet-authentication-card>
+
         <jet-validation-errors class="mb-4" />
 
-        <form @submit.prevent="submit" class="register-container">
+        <form @submit.prevent="submit">
 
-            <h1>Regístrate para escuchar.</h1>
+            <h1 class="tracking-wide text-white text-md font-bold mb-2 text-center">Regístrate para escuchar.</h1>
 
             <div>
-                <jet-label for="name" value="Nombre" class="nombre-label" />
-                <jet-input id="name" type="text" class="mt-1 block w-full" v-model="form.name" required autofocus autocomplete="name" placeholder="Nombre" />
+                <jet-label for="name" value="Nombre" class="text-white" />
+                <jet-input id="name" type="text" class="mt-1 block w-full bg-transparent text-white" v-model="form.name" required autofocus autocomplete="name" placeholder="Nombre" />
             </div>
 
             <div class="mt-4">
-                <jet-label for="email" value="Email" class="email-label" />
-                <jet-input id="email" type="email" class="mt-1 block w-full" v-model="form.email" required placeholder="Email" />
+                <jet-label for="email" value="Email" class="text-white" />
+                <jet-input id="email" type="email" class="mt-1 block w-full bg-transparent text-white" v-model="form.email" required placeholder="Email" />
             </div>
 
             <div class="mt-4">
-                <jet-label for="password" value="Contraseña"  class="pass-label"/>
-                <jet-input id="password" type="password" class="mt-1 block w-full" v-model="form.password" required autocomplete="new-password" placeholder="Contraseña"/>
+                <jet-label for="password" value="Contraseña"  class="text-white"/>
+                <jet-input id="password" type="password" class="mt-1 block w-full bg-transparent text-white" v-model="form.password" required autocomplete="new-password" placeholder="Contraseña"/>
             </div>
 
             <div class="mt-4">
-                <jet-label for="password_confirmation" value="Confirma tu Contraseña" class="confirmpass-label"/>
-                <jet-input id="password_confirmation" type="password" class="mt-1 block w-full" v-model="form.password_confirmation" required autocomplete="new-password" placeholder="Confirma tu contraseña" />
+                <jet-label for="password_confirmation" value="Confirma tu Contraseña" class="text-white"/>
+                <jet-input id="password_confirmation" type="password" class="mt-1 block w-full bg-transparent text-white" v-model="form.password_confirmation" required autocomplete="new-password" placeholder="Confirma tu contraseña" />
             </div>
 
             <div class="mt-4" v-if="$page.props.jetstream.hasTermsAndPrivacyPolicyFeature">
@@ -54,16 +56,16 @@
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <Link :href="route('login')" class="underline text-sm text-gray-600 hover:text-gray-900">
+                <Link :href="route('login')" class="underline text-sm text-gray-600 hover:text-gray-900 text-white">
                     ¿Ya tienes cuenta?
                 </Link>
 
-                <jet-button class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
+                <jet-button class="ml-4 text-white" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                     Registrarte
                 </jet-button>
             </div>
         </form>
-
+    </jet-authentication-card>
 </template>
 
 
@@ -134,44 +136,6 @@
 
 header{
     position:fixed;
-}
-
-.register-container{
-    height: 520px;
-    width: 420px;
-    background: #000;
-    color: #fff;
-    top: 50%;
-    left: 50%;
-    position: fixed;
-    transform: translate(-50%, -50%);
-    box-sizing: border-box;
-    border-radius: 5%;
-    padding: 70px 30px;
-}
-
-.register-container h1{
-    margin: 0;
-    padding: 0 0 20px;
-    text-align: center;
-    font-size: 22px;
-}
-
-#name, #email, #password, #password_confirmation{
-    background-color: #000;
-    background-color: #000;
-    border: none;
-    border-bottom: 1px solid #fff;
-    background: transparent;
-    outline: none;
-}
-
-.nombre-label, .email-label, .pass-label, .confirmpass-label{
-    margin: 0;
-    padding: 0;
-    font-weight: bold;
-    display: block;
-    color: #fff;
 }
 
 </style>
