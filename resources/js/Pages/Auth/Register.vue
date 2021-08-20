@@ -1,11 +1,19 @@
 <template>
     <Head title="Register" />
 
-    <div class="head">
-        <p>This is nuestro reproductor motherfuckers</p>
-    </div>
+    <div class="contenedor flex">
+        <header class="cont-header flex">
+            <div class="logo">
+                <img src="/assets/spotify-logo.svg" class="image" />
+            </div>
 
-    <jet-authentication-card>
+            <div class="flex">
+                <Link :href="route('login')">
+                    Spotify
+                </Link>
+            </div>
+        </header>
+    </div>
 
         <jet-validation-errors class="mb-4" />
 
@@ -55,7 +63,7 @@
                 </jet-button>
             </div>
         </form>
-    </jet-authentication-card>
+
 </template>
 
 
@@ -105,15 +113,27 @@
 </script>
 
 <style scoped>
-.head{
-    width: 100%;
-    height: 10%;
-    background-color: #000;
+.flex{
+    display: flex;
+    font-size: 30px;
 }
 
-.head p{
-    color: #fff;
-    text-align: center;
+.logo{
+    width: 5%;
+    padding: 5px;
+    justify-content: center;
+
+}
+
+.cont-header{
+    border-bottom: 1px solid #d9dadc;
+    padding: 25px 0 10px;
+    justify-content: center;
+    width: 100%;
+}
+
+header{
+    position:fixed;
 }
 
 .register-container{

@@ -1,8 +1,8 @@
 <template>
     <div class="h-screen flex flex-col">
         <div class="h-5/6 flex flex-row">
-            <side-bar class="w-2/12" />
-            <content class="w-10/12" />
+            <side-bar class="w-1/5" />
+            <content class="w-4/5" />
         </div>
         <div class="h-1/6 ">
             <music-player class="w-full h-full" />
