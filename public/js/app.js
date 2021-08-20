@@ -21303,7 +21303,17 @@ __webpack_require__.r(__webpack_exports__);
       loop: {
         state: false,
         value: 1
-      }
+      },
+      defaultSong: "https://res.cloudinary.com/dmf10fesn/video/upload/v1548882863/audio/Post_Malone_-_Wow._playvk.com.mp3",
+      isLoaded: false,
+      isCurrentlyPlaying: "",
+      durationSeconds: 0,
+      currentSeconds: 0,
+      audioPlayer: undefined,
+      previousVolume: 35,
+      volume: 100,
+      autoPlay: false,
+      progressPercentageValue: 80
     };
   },
   methods: {
@@ -21337,6 +21347,15 @@ __webpack_require__.r(__webpack_exports__);
         this.onRepeat = false;
       }
     },
+    changeVolume: function changeVolume() {
+      if (this.volume > 0) {
+        this.volume = 0;
+      } else {
+        this.volume = 100;
+      }
+
+      console.log(this.volume);
+    },
     shuffleToggle: function shuffleToggle() {
       // if(this.shuffle == true){}
       this.shuffle = this.shuffle ? false : true; // //shuffle the playlist songs and rearrange
@@ -21347,6 +21366,24 @@ __webpack_require__.r(__webpack_exports__);
       //     this.playlist.songs
       // );
       // this.previousPlaylistIndex = this.playlist.currentIndex;
+    },
+    seek: function seek(e) {
+      if (this.isLoaded) {
+        var el = e.target.getBoundingClientRect();
+        var seekPos = (e.clientX - el.left) / el.width;
+        var seekPosPercentage = seekPos * 100 + "%";
+        /**
+         *  calculating the portion of the song based on where the user clicked
+         *
+         */
+
+        var songPlayTimeAfterSeek = parseInt(this.audioPlayer.duration * seekPos);
+        this.audioPlayer.currentTime = songPlayTimeAfterSeek;
+        this.progressPercentageValue = seekPosPercentage;
+        console.log(this.progressPercentageValue);
+      } else {
+        throw new Error("Song Not Loaded");
+      }
     }
   } // data () {
   //     return {
@@ -21398,8 +21435,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+/* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
+
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  name: 'SideBar'
+  name: 'SideBar',
+  props: ['users'] // setup(props) {
+  //     const user = props.usersList;
+  //     console.log(props)
+  //     return { user }
+  // }
+
 });
 
 /***/ }),
@@ -25272,7 +25319,7 @@ __webpack_require__.r(__webpack_exports__);
 (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-2849ffdc");
 
 var _hoisted_1 = {
-  "class": "flex items-center justify-between px-5"
+  "class": "component flex items-center justify-between px-5"
 };
 var _hoisted_2 = {
   "class": "flex"
@@ -25323,7 +25370,7 @@ var _hoisted_12 = {
 };
 var _hoisted_13 = {
   key: 2,
-  "class": "repeat-info"
+  "class": "repeat-info h-3.5 w-3.5 rounded-full text-center text-white capitalize tracking-wide"
 };
 var _hoisted_14 = {
   "class": "flex items-center justify-center mt-2"
@@ -25336,31 +25383,22 @@ var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 var _hoisted_16 = {
-  "class": "progress-container"
-};
-var _hoisted_17 = {
-  "class": "progress",
-  id: "progress-wrap"
+  "class": "overflow-hidden w-96 h-1 flex rounded progress-bar"
 };
 
-var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "time ml-2 font-medium text-gray-100"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "00:00"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" {{duration}} ")], -1
 /* HOISTED */
 );
 
-var _hoisted_19 = ["loop", "src"];
-
-var _hoisted_20 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "flex mr-4"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-  src: "music/AnotherOneBitesTheDust.jpg",
-  alt: "Img Song",
-  width: "80",
-  height: "80"
-}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"play\">\n                <i class=\"icon ion-ios-volume-mute\" @click=\"mute()\">Mute</i>\n            </div> ")], -1
-/* HOISTED */
-);
+var _hoisted_18 = ["loop", "src"];
+var _hoisted_19 = {
+  "class": "flex items-center mr-4"
+};
+var _hoisted_20 = {
+  "class": "overflow-hidden w-12 h-1 flex rounded progress-bar"
+};
 
 (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)();
 
@@ -25458,29 +25496,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   })), $data.onRepeat ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loop.value), 1
   /* TEXT */
-  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-repeat\" @click=\"repeat\"></i> ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Fin Botones "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [_hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "progress-handle",
+  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-repeat\" @click=\"repeat\"></i> ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Fin Botones "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [_hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
-      left: _ctx.progressPercentageValue
-    })
+      width: $data.progressPercentageValue + '%'
+    }),
+    "class": "bg-white"
   }, null, 4
   /* STYLE */
-  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "transparent-seeker-layer",
-    onClick: _cache[10] || (_cache[10] = function () {
-      return _ctx.seek && _ctx.seek.apply(_ctx, arguments);
-    })
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "bar",
-    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
-      width: _ctx.progressPercentageValue
-    })
-  }, " ------------------------------------------------------------------ ", 4
-  /* STYLE */
-  )])]), _hoisted_18]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("audio", {
+  )]), _hoisted_17]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("audio", {
     loop: _ctx.innerLoop,
     ref: "audiofile",
-    src: _ctx.defaultSong,
+    src: $data.defaultSong,
     preload: "",
     style: {
       "display": "none"
@@ -25488,7 +25514,34 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     controls: ""
   }, null, 8
   /* PROPS */
-  , _hoisted_19)]), _hoisted_20]);
+  , _hoisted_18)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [$data.volume == 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
+    key: 0,
+    src: "assets/Mute.png",
+    alt: "Shuffle button",
+    "class": "mr-2",
+    width: "25",
+    height: "25",
+    onClick: _cache[10] || (_cache[10] = function () {
+      return $options.changeVolume && $options.changeVolume.apply($options, arguments);
+    })
+  })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
+    key: 1,
+    src: "assets/Volume.png",
+    alt: "Shuffle button",
+    "class": "mr-2",
+    width: "25",
+    height: "25",
+    onClick: _cache[11] || (_cache[11] = function () {
+      return $options.changeVolume && $options.changeVolume.apply($options, arguments);
+    })
+  })), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
+      width: $data.volume + '%'
+    }),
+    "class": "bg-white"
+  }, null, 4
+  /* STYLE */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" style={{ width: \"30%\" }}  style=\"width:40%\" ")])])]);
 }
 
 /***/ }),
@@ -25513,10 +25566,12 @@ var _hoisted_1 = {
   "class": "content"
 };
 
+var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"flex flex-col mx-2\" data-v-5bc836d9><div data-v-5bc836d9><img src=\"assets/spotify.png\" width=\"175\" height=\"40\" alt=\"\" srcset=\"\" data-v-5bc836d9></div><div class=\"flex flex-row place-items-center my-2\" data-v-5bc836d9><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6 mx-2\" viewBox=\"0 0 20 20\" fill=\"white\" data-v-5bc836d9><path d=\"M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z\" data-v-5bc836d9></path></svg><span class=\"text-md font-bold text-white ml-2\" data-v-5bc836d9>Inicio</span></div><div class=\"flex flex-row place-items-center my-2\" data-v-5bc836d9><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6 mx-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"white\" data-v-5bc836d9><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z\" data-v-5bc836d9></path></svg><span class=\"text-md font-bold text-white ml-2\" data-v-5bc836d9>Buscar</span></div><div class=\"flex flex-row place-items-center my-2\" data-v-5bc836d9><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6 mx-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"white\" data-v-5bc836d9><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253\" data-v-5bc836d9></path></svg><span class=\"text-md font-bold text-white ml-2\" data-v-5bc836d9>Tu biblioteca</span></div></div>", 1);
+
 (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)();
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1);
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" {{users}} "), _hoisted_2]);
 }
 
 /***/ }),
@@ -25555,8 +25610,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_content, {
     "class": "w-10/12"
   })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_music_player, {
-    "class": "bg-gray-900 w-full h-full"
-  })])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <app-layout title=\"Dashboard\" >\r\n        <template #header>\r\n            <h2 class=\"font-semibold text-xl text-gray-800 leading-tight\">\r\n                Dashboard\r\n            </h2>\r\n        </template>\r\n\r\n        <div class=\"py-12\">\r\n            <div class=\"max-w-7xl mx-auto sm:px-6 lg:px-8\">\r\n                <div class=\"bg-white overflow-hidden shadow-xl sm:rounded-lg\">\r\n                    <welcome />\r\n                </div>\r\n            </div>\r\n        </div>\r\n        \r\n    </app-layout> ")], 2112
+    "class": "w-full h-full"
+  })])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <app-layout title=\"Dashboard\" >\n        <template #header>\n            <h2 class=\"font-semibold text-xl text-gray-800 leading-tight\">\n                Dashboard\n            </h2>\n        </template>\n\n        <div class=\"py-12\">\n            <div class=\"max-w-7xl mx-auto sm:px-6 lg:px-8\">\n                <div class=\"bg-white overflow-hidden shadow-xl sm:rounded-lg\">\n                    <welcome />\n                </div>\n            </div>\n        </div>\n\n    </app-layout> ")], 2112
   /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
   );
 }
@@ -27017,7 +27072,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.repeat-info[data-v-2849ffdc] {\n    background-color: #0BA531;\n    width: 13px;\n    height: 13px;\n    border-radius: 8px;\n    font-size: 7px;\n    line-height: 12px;\n    text-align: center;\n    right: -12px;\n    top: 5px;\n    color: #fff;\n    text-transform: capitalize;\n    letter-spacing: 1px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.component[data-v-2849ffdc]{\n    background-color: rgba(18, 18, 18, 1);\n    border-top: 0.1rem solid #8F8F8F;\n}\n.progress-bar[data-v-2849ffdc]{\n    --tw-bg-opacity: 1;\n    background-color: #8F8F8F;\n}\n.repeat-info[data-v-2849ffdc] {\n    background-color: #08a830;\n    font-size: 9px;\n    line-height: 14px;\n}\n.progress-container[data-v-2849ffdc] {\n    position: relative;\n    height: 10px;\n    width: auto;\n    display: flex;\n    align-items: center;\n}\n.progress[data-v-2849ffdc] {\n    background-color: rgba(0, 0, 0, 0.05);\n    height: 4px;\n    /* width: calc(75% - 30px); */\n    width: 100%;\n    margin: 0;\n    padding: 0 2px;\n    border-radius: 0;\n    display: flex;\n    align-items: center;\n\n    box-shadow: 0 1px 1px rgba(0, 0, 0, .1);\n}\n.progress-handle[data-v-2849ffdc] {\n    display: block;\n    position: absolute;\n    z-index: 6;\n    margin-top: 0;\n    margin-left: -2px;\n    width: 8px;\n    height: 8px;\n    border-radius: 100%;\n    background-color: #fff;\n    box-shadow: 0 1px 6px rgba(0, 0, 0, .2);\n    cursor: pointer;\n\n    /* &:hover {\n        background-color: #000;\n    } */\n}\n.transparent-seeker-layer[data-v-2849ffdc] {\n    /* please do not delete this layer unless you know what you are doing\n     this code allows the seeker click position to function well */\n    width: 100%;\n    height: 6px;\n    background-color: transparent;\n    position: absolute;\n    cursor: pointer;\n    z-index: 5;\n}\n.bar[data-v-2849ffdc] {\n    width: 0;\n    background-color: #fff;\n    height: 4px;\n    position: absolute;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -27041,7 +27096,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.content[data-v-5bc836d9]{\r\n    background-color: red;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.content[data-v-5bc836d9]{\r\n    background-color: #080404;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
