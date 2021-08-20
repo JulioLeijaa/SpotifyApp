@@ -11,85 +11,10 @@
 <script>
 export default {
     name:'Playlists',
+    props:['playlists'],
     data() {
         return {
-            playlists:[
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                },
-                {
-                    'name':'Playlist1'
-                }
-            ]
+            
         }
     },
 }
