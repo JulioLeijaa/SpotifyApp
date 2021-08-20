@@ -23,6 +23,7 @@
     "/music/YoSeQueTeAcordaras.mp3": "/music/YoSeQueTeAcordaras.mp3",
     "/assets/Corazon.png": "/assets/Corazon.png",
     "/assets/CorazonColoreado.png": "/assets/CorazonColoreado.png",
+    "/assets/Mute.png": "/assets/Mute.png",
     "/assets/Pause.png": "/assets/Pause.png",
     "/assets/Play.png": "/assets/Play.png",
     "/assets/Repeat.png": "/assets/Repeat.png",
@@ -32,5 +33,10 @@
     "/assets/spotify-logo.svg": "/assets/spotify-logo.svg",
     "/assets/spotify.png": "/assets/spotify.png",
     "/assets/Suffle.png": "/assets/Suffle.png",
+<<<<<<< HEAD
     "/assets/SuffleActivado.png": "/assets/SuffleActivado.png"
+=======
+    "/assets/SuffleActivado.png": "/assets/SuffleActivado.png",
+    "/assets/Volume.png": "/assets/Volume.png"
+>>>>>>> 3177e50732f29942c7f418f4ae0452bddb9f6b78
 }

@@ -5,7 +5,7 @@
             <content class="w-4/5" />
         </div>
         <div class="h-1/6 ">
-            <music-player class="bg-gray-900 w-full h-full" />
+            <music-player class="w-full h-full" />
         </div>
     </div>
     <!-- <app-layout title="Dashboard" >
@@ -22,7 +22,7 @@
                 </div>
             </div>
         </div>
-        
+
     </app-layout> -->
 </template>
 

@@ -21292,6 +21292,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'MusicPlayer',
   data: function data() {
@@ -21303,19 +21305,70 @@ __webpack_require__.r(__webpack_exports__);
       loop: {
         state: false,
         value: 1
+      },
+      defaultSong: "music/AnotherOneBitesTheDust.mp3",
+      isLoaded: false,
+      isCurrentlyPlaying: "",
+      durationSeconds: 0,
+      currentSeconds: 0,
+      audioPlayer: undefined,
+      previousVolume: 35,
+      volume: 100,
+      autoPlay: false,
+      progressPercentageValue: 80,
+      currentSong: {
+        id: "",
+        title: "Another one bites the dust",
+        artist: "Queen",
+        album: "",
+        url: "",
+        cover_art_url: ""
       }
     };
   },
+  created: function created() {
+    this.innerLoop = this.loop.state;
+  },
+  mounted: function mounted() {
+    this.audioPlayer = this.$el.querySelectorAll("audio")[0];
+    this.initPlayer();
+  },
+  computed: {
+    currentPlayedTime: function currentPlayedTime() {
+      return this.formatTime(this.currentSeconds);
+    },
+    duration: function duration() {
+      return this.formatTime(this.durationSeconds);
+    },
+    progressPercentage: function progressPercentage() {
+      return parseInt(this.currentSeconds / this.durationSeconds * 100);
+    },
+    muted: function muted() {
+      //this returns true or false
+      return this.volume / 100 === 0;
+    }
+  },
   methods: {
     playCurrentSong: function playCurrentSong() {
-      // this.audioPlayer.play();
+      this.audioPlayer.play();
       this.isPlaying = true;
     },
     pause: function pause() {
-      // this.audioPlayer.pause();
+      this.audioPlayer.pause();
       this.isPlaying = false;
     },
-    stop: function stop() {// this.audioPlayer.currentTime = 0;
+    stop: function stop() {
+      this.audioPlayer.currentTime = 0;
+    },
+    mute: function mute() {
+      //this.muted is a computed variable available down below
+      this.audioPlayer.muted = !this.audioPlayer.muted;
+
+      if (this.volume > 0) {
+        this.volume = 0;
+      } else {
+        this.volume = 100;
+      }
     },
     likeSong: function likeSong() {
       this.isLiked = this.isLiked ? false : true;
@@ -21337,8 +21390,32 @@ __webpack_require__.r(__webpack_exports__);
         this.onRepeat = false;
       }
     },
+    skip: function skip(direction) {
+      if (direction === "forward") {
+        this.playlist.currentIndex += 1;
+      } else if (direction === "backward") {
+        this.playlist.currentIndex -= 1;
+      }
+      /**if the current Index of the playlist is greater or equal to the length of the playlist songs (the index is out of range)
+       reset the index to 0. It could also mean that the playlist is at its end. */
+
+
+      if (this.playlist.currentIndex >= this.playlist.songs.length) {
+        this.playlist.currentIndex = 0;
+      }
+
+      if (this.playlist.currentIndex < 0) {
+        this.playlist.currentIndex = this.playlist.songs.length - 1;
+      }
+
+      this.audioPlayer.src = this.playlist.songs[this.playlist.currentIndex].url;
+      this.setCurrentSong(this.playlist.songs[this.playlist.currentIndex]); //the code below checks if a song is playing so it can go ahead and auto play
+
+      if (this.isPlaying) {
+        this.audioPlayer.play();
+      }
+    },
     shuffleToggle: function shuffleToggle() {
-      // if(this.shuffle == true){}
       this.shuffle = this.shuffle ? false : true; // //shuffle the playlist songs and rearrange
       // this.playlist.songs = this.shuffleArray(this.playlist.songs);
       // //reset the playlist index when changed and rest the previous playlist index
@@ -21347,42 +21424,99 @@ __webpack_require__.r(__webpack_exports__);
       //     this.playlist.songs
       // );
       // this.previousPlaylistIndex = this.playlist.currentIndex;
-    }
-  } // data () {
-  //     return {
-  //         defaultSong: "https://res.cloudinary.com/dmf10fesn/video/upload/v1548882863/audio/Post_Malone_-_Wow._playvk.com.mp3",
-  //         isPlaying: false,
-  //         isLoaded: false,
-  //         isCurrentlyPlaying: "",
-  //         onRepeat: false,
-  //         shuffle: false,
-  //         loop: {
-  //             state: false,
-  //             value: 1
-  //             },
-  //         durationSeconds: 0,
-  //         currentSeconds: 0,
-  //         audioPlayer: undefined,
-  //         previousVolume: 35,
-  //         volume: 100,
-  //         autoPlay: false,
-  //         progressPercentageValue: "0%",
-  //         previousPlaylistIndex: 0,
-  //         hasNext: false,
-  //         originalSongArray: [],
-  //         currentSong: {
-  //         id: "",
-  //         title: "",
-  //         artist: "",
-  //         album: "",
-  //         url: "",
-  //         cover_art_url: ""
-  //         },
-  //         /** ui control variables*/
-  //         showPlaylist: false
-  //     }
-  // }
+    },
+    seek: function seek(e) {
+      if (this.isLoaded) {
+        var el = e.target.getBoundingClientRect();
+        var seekPos = (e.clientX - el.left) / el.width;
+        var seekPosPercentage = seekPos * 100 + "%";
+        /**
+         *  calculating the portion of the song based on where the user clicked
+         *
+         */
 
+        var songPlayTimeAfterSeek = parseInt(this.audioPlayer.duration * seekPos);
+        this.audioPlayer.currentTime = songPlayTimeAfterSeek;
+        this.progressPercentageValue = seekPosPercentage;
+        console.log(this.progressPercentageValue);
+      } else {
+        throw new Error("Song Not Loaded");
+      }
+    },
+    initPlayer: function initPlayer() {
+      var _this = this;
+
+      this.audioPlayer.src = this.playlist.songs[0].url;
+      this.setCurrentSong(this.playlist.songs[0]);
+      this.audioPlayer.addEventListener("timeupdate", this.updateTimer);
+      this.audioPlayer.addEventListener("loadeddata", this.load);
+      this.audioPlayer.addEventListener("pause", function () {
+        _this.isPlaying = false;
+      });
+      this.audioPlayer.addEventListener("play", function () {
+        _this.isPlaying = true;
+      });
+      this.audioPlayer.addEventListener("ended", this.playNextSongInPlaylist);
+    },
+    play: function play() {
+      var song = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+      if (_typeof(song) === "object") {
+        if (this.isLoaded) {
+          //check if song exists in playlist
+          if (this.currentSong.id === song.id && this.isPlaying) {
+            this.pause();
+          } else if (this.currentSong.id === song.id && !this.isPlaying) {
+            this.playCurrentSong();
+          } else if (this.currentSong.id !== song.id) {
+            if (!this.containsObjectWithSameId(song, this.playlist.songs)) {
+              this.addToPlaylist(song);
+            } else {
+              console.log("playMethod", "song already in playlist");
+            }
+
+            this.setAudio(song.url);
+            this.setCurrentSong(song);
+            this.playlist.currentIndex = this.getObjectIndexFromArray(song, this.playlist.songs);
+            this.previousPlaylistIndex = this.playlist.currentIndex;
+            this.audioPlayer.play();
+          }
+        } else {
+          this.setAudio(song.url);
+          this.audioPlayer.play();
+        }
+
+        this.isPlaying = true;
+      } else {
+        throw new Error("Type Error : Song must be an object");
+      }
+    },
+    load: function load() {
+      if (this.audioPlayer.readyState >= 2) {
+        this.isLoaded = true;
+        this.durationSeconds = parseInt(this.audioPlayer.duration);
+      } else {
+        throw new Error("Failed to load sound file.");
+      }
+    },
+    formatTime: function formatTime(secs) {
+      var minutes = Math.floor(secs / 60) || 0;
+      var seconds = Math.floor(secs - minutes * 60) || 0;
+      return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+    },
+    setAudio: function setAudio(song) {
+      this.audioPlayer.src = song;
+    },
+    setCurrentSong: function setCurrentSong(song) {
+      this.currentSong.id = song.id;
+      this.currentSong.title = song.title;
+      this.currentSong.artist = song.artist;
+      this.currentSong.album = song.album;
+      this.currentSong.url = song.url;
+      this.currentSong.cover_art_url = song.cover_art_url;
+      this.previousPlaylistIndex = this.playlist.currentIndex;
+    }
+  }
 });
 
 /***/ }),
@@ -25434,105 +25568,91 @@ __webpack_require__.r(__webpack_exports__);
 (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-2849ffdc");
 
 var _hoisted_1 = {
-  "class": "flex items-center justify-between px-5"
+  "class": "component flex items-center justify-between px-5"
 };
 var _hoisted_2 = {
-  "class": "flex"
+  "class": "flex max-w-xs"
 };
 
 var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
   src: "music/AnotherOneBitesTheDust.jpg",
   alt: "Img Song",
-  width: "80",
-  height: "80"
+  width: "70",
+  height: "70"
 }, null, -1
 /* HOISTED */
 );
 
-var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_4 = {
   "class": "flex items-center ml-4"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
-  "class": "text-xl font-bold text-gray-100"
-}, "Tema"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
-  "class": "text-base font-medium text-white"
-}, "Artista")])], -1
-/* HOISTED */
-);
-
+};
 var _hoisted_5 = {
-  "class": "flex items-center ml-4"
+  "class": "text-base font-semibold text-gray-100"
 };
 var _hoisted_6 = {
-  "class": "flex flex-col"
+  "class": "text-xs font-normal text-white"
 };
 var _hoisted_7 = {
-  "class": "flex items-center justify-center"
+  "class": "flex items-center ml-4"
 };
 var _hoisted_8 = {
-  "class": "shuffle-icon mr-6"
+  "class": "flex flex-col mr-12"
 };
 var _hoisted_9 = {
-  "class": "skip-backward mr-6"
+  "class": "flex items-center justify-center"
 };
 var _hoisted_10 = {
-  "class": "play"
+  "class": "mr-6"
 };
 var _hoisted_11 = {
-  "class": "skip-forward ml-6"
+  "class": "mr-6"
 };
 var _hoisted_12 = {
-  "class": "flex repeat ml-6"
+  "class": ""
 };
 var _hoisted_13 = {
-  key: 2,
-  "class": "repeat-info"
+  "class": "ml-6"
 };
 var _hoisted_14 = {
-  "class": "flex items-center justify-center mt-2"
+  "class": "flex ml-6"
 };
-
-var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "time mr-2 font-medium text-gray-100"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "00:00"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" {{currentPlayedTime}} ")], -1
-/* HOISTED */
-);
-
+var _hoisted_15 = {
+  key: 2,
+  "class": "repeat-info h-3.5 w-3.5 rounded-full text-center text-white capitalize tracking-wide"
+};
 var _hoisted_16 = {
-  "class": "progress-container"
+  "class": "flex items-center justify-center mt-1"
 };
 var _hoisted_17 = {
-  "class": "progress",
-  id: "progress-wrap"
+  "class": "text-xs mr-2 font-normal text-gray-100"
 };
-
-var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "time ml-2 font-medium text-gray-100"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "00:00"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" {{duration}} ")], -1
-/* HOISTED */
-);
-
-var _hoisted_19 = ["loop", "src"];
-
-var _hoisted_20 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "flex mr-4"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-  src: "music/AnotherOneBitesTheDust.jpg",
-  alt: "Img Song",
-  width: "80",
-  height: "80"
-}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"play\">\r\n                <i class=\"icon ion-ios-volume-mute\" @click=\"mute()\">Mute</i>\r\n            </div> ")], -1
-/* HOISTED */
-);
+var _hoisted_18 = {
+  "class": "overflow-hidden h-1 flex rounded progress-bar gray-color"
+};
+var _hoisted_19 = {
+  "class": "text-xs ml-2 font-normal text-gray-100"
+};
+var _hoisted_20 = ["loop", "src"];
+var _hoisted_21 = {
+  "class": "flex items-center mr-4"
+};
+var _hoisted_22 = {
+  "class": "overflow-hidden w-20 h-1 flex rounded gray-color"
+};
 
 (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)();
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [_hoisted_3, _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [!$data.isLiked ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [_hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.currentSong.title), 1
+  /* TEXT */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Tema {{song.title}} "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.currentSong.artist), 1
+  /* TEXT */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Artista {{song.artist}}  ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [!$data.isLiked ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
     key: 0,
     src: "assets/Corazon.png",
     alt: "Img Song",
-    width: "25",
-    height: "25",
+    width: "20",
+    height: "20",
     onClick: _cache[0] || (_cache[0] = function () {
       return $options.likeSong && $options.likeSong.apply($options, arguments);
     })
@@ -25540,17 +25660,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 1,
     src: "assets/CorazonColoreado.png",
     alt: "Img Song",
-    width: "25",
-    height: "25",
+    width: "20",
+    height: "20",
     onClick: _cache[1] || (_cache[1] = function () {
       return $options.likeSong && $options.likeSong.apply($options, arguments);
     })
-  }))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Inicio Botones "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [!$data.shuffle ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
+  }))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Inicio Botones "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [!$data.shuffle ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
     key: 0,
     src: "assets/Suffle.png",
     alt: "Shuffle button",
-    width: "25",
-    height: "25",
+    width: "20",
+    height: "20",
     onClick: _cache[2] || (_cache[2] = function () {
       return $options.shuffleToggle && $options.shuffleToggle.apply($options, arguments);
     })
@@ -25558,25 +25678,25 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 1,
     src: "assets/SuffleActivado.png",
     alt: "Shuffle button",
-    width: "25",
-    height: "25",
+    width: "20",
+    height: "20",
     onClick: _cache[3] || (_cache[3] = function () {
       return $options.shuffleToggle && $options.shuffleToggle.apply($options, arguments);
     })
-  })), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-shuffle\" ></i> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+  })), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-shuffle\" ></i> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
     src: "assets/SkipBackward.png",
     alt: "Skip Backward button",
-    width: "25",
-    height: "25",
+    width: "20",
+    height: "20",
     onClick: _cache[4] || (_cache[4] = function ($event) {
-      return _ctx.skip('backward');
+      return $options.skip('backward');
     })
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-skip-backward\" @click=\"skip('backward')\"></i> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [!$data.isPlaying ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-skip-backward\" @click=\"skip('backward')\"></i> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [!$data.isPlaying ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
     key: 0,
     src: "assets/Play.png",
     alt: "Shuffle button",
-    width: "40",
-    height: "40",
+    width: "35",
+    height: "35",
     onClick: _cache[5] || (_cache[5] = function () {
       return $options.playCurrentSong && $options.playCurrentSong.apply($options, arguments);
     })
@@ -25585,27 +25705,27 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-play\" v-if=\"!isPlaying\" @click=\"playCurrentSong\"></i> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
     src: "assets/Pause.png",
     alt: "Shuffle button",
-    width: "40",
-    height: "40",
+    width: "35",
+    height: "35",
     onClick: _cache[6] || (_cache[6] = function () {
       return $options.pause && $options.pause.apply($options, arguments);
     })
   })], 2112
   /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
-  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-pause\" v-else @click=\"pause\"></i> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-pause\" v-else @click=\"pause\"></i> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
     src: "assets/SkipForward.png",
     alt: "Skip Forward button",
-    width: "25",
-    height: "25",
+    width: "20",
+    height: "20",
     onClick: _cache[7] || (_cache[7] = function ($event) {
-      return _ctx.skip('forward');
+      return $options.skip('forward');
     })
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-skip-forward\" @click=\"skip('forward')\"></i> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [!$data.onRepeat ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-skip-forward\" @click=\"skip('forward')\"></i> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [!$data.onRepeat ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
     key: 0,
     src: "assets/Repeat.png",
     alt: "Shuffle button",
-    width: "25",
-    height: "25",
+    width: "20",
+    height: "20",
     onClick: _cache[8] || (_cache[8] = function () {
       return $options.repeat && $options.repeat.apply($options, arguments);
     })
@@ -25613,36 +25733,28 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 1,
     src: "assets/RepeatActivado.png",
     alt: "Shuffle button",
-    width: "25",
-    height: "25",
+    width: "20",
+    height: "20",
     onClick: _cache[9] || (_cache[9] = function () {
       return $options.repeat && $options.repeat.apply($options, arguments);
     })
-  })), $data.onRepeat ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loop.value), 1
+  })), $data.onRepeat ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loop.value), 1
   /* TEXT */
-  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-repeat\" @click=\"repeat\"></i> ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Fin Botones "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [_hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "progress-handle",
+  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-repeat\" @click=\"repeat\"></i> ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Fin Botones "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.currentPlayedTime), 1
+  /* TEXT */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 00:00 ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" w-96 "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
-      left: _ctx.progressPercentageValue
-    })
+      width: $data.progressPercentageValue + '%'
+    }),
+    "class": "bg-white"
   }, null, 4
   /* STYLE */
-  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "transparent-seeker-layer",
-    onClick: _cache[10] || (_cache[10] = function () {
-      return _ctx.seek && _ctx.seek.apply(_ctx, arguments);
-    })
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "bar",
-    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
-      width: _ctx.progressPercentageValue
-    })
-  }, " ------------------------------------------------------------------ ", 4
-  /* STYLE */
-  )])]), _hoisted_18]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("audio", {
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" progressPercentageValue ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.duration), 1
+  /* TEXT */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 00:00 ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("audio", {
     loop: _ctx.innerLoop,
     ref: "audiofile",
-    src: _ctx.defaultSong,
+    src: $data.defaultSong,
     preload: "",
     style: {
       "display": "none"
@@ -25650,7 +25762,34 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     controls: ""
   }, null, 8
   /* PROPS */
-  , _hoisted_19)]), _hoisted_20]);
+  , _hoisted_20)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [$data.volume == 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
+    key: 0,
+    src: "assets/Mute.png",
+    alt: "Shuffle button",
+    "class": "mr-2",
+    width: "20",
+    height: "20",
+    onClick: _cache[10] || (_cache[10] = function () {
+      return $options.mute && $options.mute.apply($options, arguments);
+    })
+  })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
+    key: 1,
+    src: "assets/Volume.png",
+    alt: "Shuffle button",
+    "class": "mr-2",
+    width: "20",
+    height: "20",
+    onClick: _cache[11] || (_cache[11] = function () {
+      return $options.mute && $options.mute.apply($options, arguments);
+    })
+  })), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
+      width: $data.volume + '%'
+    }),
+    "class": "bg-white"
+  }, null, 4
+  /* STYLE */
+  )])])]);
 }
 
 /***/ }),
@@ -25797,8 +25936,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_content, {
     "class": "w-4/5"
   })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_music_player, {
-    "class": "bg-gray-900 w-full h-full"
-  })])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <app-layout title=\"Dashboard\" >\r\n        <template #header>\r\n            <h2 class=\"font-semibold text-xl text-gray-800 leading-tight\">\r\n                Dashboard\r\n            </h2>\r\n        </template>\r\n\r\n        <div class=\"py-12\">\r\n            <div class=\"max-w-7xl mx-auto sm:px-6 lg:px-8\">\r\n                <div class=\"bg-white overflow-hidden shadow-xl sm:rounded-lg\">\r\n                    <welcome />\r\n                </div>\r\n            </div>\r\n        </div>\r\n        \r\n    </app-layout> ")], 2112
+    "class": "w-full h-full"
+  })])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <app-layout title=\"Dashboard\" >\r\n        <template #header>\r\n            <h2 class=\"font-semibold text-xl text-gray-800 leading-tight\">\r\n                Dashboard\r\n            </h2>\r\n        </template>\r\n\r\n        <div class=\"py-12\">\r\n            <div class=\"max-w-7xl mx-auto sm:px-6 lg:px-8\">\r\n                <div class=\"bg-white overflow-hidden shadow-xl sm:rounded-lg\">\r\n                    <welcome />\r\n                </div>\r\n            </div>\r\n        </div>\r\n\r\n    </app-layout> ")], 2112
   /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
   );
 }
@@ -27187,7 +27326,11 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
+<<<<<<< HEAD
 ___CSS_LOADER_EXPORT___.push([module.id, "\n.flex[data-v-a2ac2cea]{\n    display: flex;\n    font-size: 30px;\n}\n.logo[data-v-a2ac2cea]{\n    width: 5%;\n    padding: 5px;\n    justify-content: center;\n}\n.cont-header[data-v-a2ac2cea]{\n    border-bottom: 1px solid #d9dadc;\n    padding: 25px 0 10px;\n    justify-content: center;\n    width: 100%;\n}\nheader[data-v-a2ac2cea]{\n    position:fixed;\n}\n\n", ""]);
+=======
+___CSS_LOADER_EXPORT___.push([module.id, "\n.flex[data-v-a2ac2cea]{\r\n    display: flex;\r\n    font-size: 30px;\n}\n.logo[data-v-a2ac2cea]{\r\n    width: 5%;\r\n    padding: 5px;\r\n    justify-content: center;\n}\n.cont-header[data-v-a2ac2cea]{\r\n    border-bottom: 1px solid #d9dadc;\r\n    padding: 25px 0 10px;\r\n    justify-content: center;\r\n    width: 100%;\n}\nheader[data-v-a2ac2cea]{\r\n    position:fixed;\n}\n.login-container[data-v-a2ac2cea]{\r\n    height: 520px;\r\n    width: 420px;\r\n    background: #000;\r\n    color: #fff;\r\n    top: 50%;\r\n    left: 50%;\r\n    position: fixed;\r\n    transform: translate(-50%, -50%);\r\n    box-sizing: border-box;\r\n    border-radius: 5%;\r\n    padding: 70px 30px;\n}\n.login-container h1[data-v-a2ac2cea]{\r\n    margin: 0;\r\n    padding: 0 0 50px;\r\n    text-align: center;\r\n    font-size: 22px;\n}\n#email[data-v-a2ac2cea], #password[data-v-a2ac2cea]{\r\n    background-color: #000;\r\n    border: none;\r\n    border-bottom: 1px solid #fff;\r\n    background: transparent;\r\n    outline: none;\n}\n.email-label[data-v-a2ac2cea], .pass-label[data-v-a2ac2cea]{\r\n    margin: 0;\r\n    padding: 0;\r\n    font-weight: bold;\r\n    display: block;\r\n    color: #fff;\n}\r\n", ""]);
+>>>>>>> 3177e50732f29942c7f418f4ae0452bddb9f6b78
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -27211,7 +27354,11 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
+<<<<<<< HEAD
 ___CSS_LOADER_EXPORT___.push([module.id, "\n.flex[data-v-e59c811e]{\n    display: flex;\n    font-size: 30px;\n}\n.logo[data-v-e59c811e]{\n    width: 5%;\n    padding: 5px;\n    justify-content: center;\n}\n.cont-header[data-v-e59c811e]{\n    border-bottom: 1px solid #d9dadc;\n    padding: 25px 0 10px;\n    justify-content: center;\n    width: 100%;\n}\nheader[data-v-e59c811e]{\n    position:fixed;\n}\n\n", ""]);
+=======
+___CSS_LOADER_EXPORT___.push([module.id, "\n.flex[data-v-e59c811e]{\r\n    display: flex;\r\n    font-size: 30px;\n}\n.logo[data-v-e59c811e]{\r\n    width: 5%;\r\n    padding: 5px;\r\n    justify-content: center;\n}\n.cont-header[data-v-e59c811e]{\r\n    border-bottom: 1px solid #d9dadc;\r\n    padding: 25px 0 10px;\r\n    justify-content: center;\r\n    width: 100%;\n}\nheader[data-v-e59c811e]{\r\n    position:fixed;\n}\n.register-container[data-v-e59c811e]{\r\n    height: 520px;\r\n    width: 420px;\r\n    background: #000;\r\n    color: #fff;\r\n    top: 50%;\r\n    left: 50%;\r\n    position: fixed;\r\n    transform: translate(-50%, -50%);\r\n    box-sizing: border-box;\r\n    border-radius: 5%;\r\n    padding: 70px 30px;\n}\n.register-container h1[data-v-e59c811e]{\r\n    margin: 0;\r\n    padding: 0 0 20px;\r\n    text-align: center;\r\n    font-size: 22px;\n}\n#name[data-v-e59c811e], #email[data-v-e59c811e], #password[data-v-e59c811e], #password_confirmation[data-v-e59c811e]{\r\n    background-color: #000;\r\n    background-color: #000;\r\n    border: none;\r\n    border-bottom: 1px solid #fff;\r\n    background: transparent;\r\n    outline: none;\n}\n.nombre-label[data-v-e59c811e], .email-label[data-v-e59c811e], .pass-label[data-v-e59c811e], .confirmpass-label[data-v-e59c811e]{\r\n    margin: 0;\r\n    padding: 0;\r\n    font-weight: bold;\r\n    display: block;\r\n    color: #fff;\n}\r\n\r\n", ""]);
+>>>>>>> 3177e50732f29942c7f418f4ae0452bddb9f6b78
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -27259,7 +27406,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.repeat-info[data-v-2849ffdc] {\r\n    background-color: #0BA531;\r\n    width: 13px;\r\n    height: 13px;\r\n    border-radius: 8px;\r\n    font-size: 7px;\r\n    line-height: 12px;\r\n    text-align: center;\r\n    right: -12px;\r\n    top: 5px;\r\n    color: #fff;\r\n    text-transform: capitalize;\r\n    letter-spacing: 1px;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.component[data-v-2849ffdc]{\n    background-color: rgba(18, 18, 18, 1);\n    border-top: 0.1rem solid #8F8F8F;\n}\n.progress-bar[data-v-2849ffdc]{\n    width: 30rem;\n}\n.gray-color[data-v-2849ffdc]{\n    --tw-bg-opacity: 1;\n    background-color: #8F8F8F;\n}\n.repeat-info[data-v-2849ffdc] {\n    background-color: #08a830;\n    font-size: 9px;\n    line-height: 14px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -27356,7 +27503,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.navbar[data-v-317d1a6e]{\n    background-color: #000;\n    color: #fff;\n    display: flex;\n    justify-content: space-around;\n    align-items: center;\n    font-size: 20px;\n}\n.navbar ul[data-v-317d1a6e]{\n    list-style-type: none;\n}\n.navbar li[data-v-317d1a6e]{\n    display: inline-block;\n    padding: 20px 10px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.navbar[data-v-317d1a6e]{\r\n    background-color: #000;\r\n    color: #fff;\r\n    display: flex;\r\n    justify-content: space-around;\r\n    align-items: center;\r\n    font-size: 20px;\n}\n.navbar ul[data-v-317d1a6e]{\r\n    list-style-type: none;\n}\n.navbar li[data-v-317d1a6e]{\r\n    display: inline-block;\r\n    padding: 20px 10px;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
