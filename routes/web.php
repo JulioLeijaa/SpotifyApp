@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\SideBarController;
+use App\Http\Controllers\PlaylistController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,8 @@ Route::get('/', function () {
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->name('dashboard');
+
+Route::middleware(['auth:sanctum', 'verified'])->get('/playlist/{id}', [PlaylistController::class, 'index'])->name('playlist');
 
 // Route::resource('posts', SideBarController::class);
 Route::middleware(['auth:sanctum', 'verified'])->get('/playlists', [SideBarController::class,'index'])->name('playlists');

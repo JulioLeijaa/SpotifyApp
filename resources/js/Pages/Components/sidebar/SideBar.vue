@@ -35,7 +35,7 @@ export default {
             let response = await axios.get('/playlists')
             playlists.value = response.data
         });
-        console.log(playlists);
+        // console.log(playlists);
         return { playlists }
     }
 }
