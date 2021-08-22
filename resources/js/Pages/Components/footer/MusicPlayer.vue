@@ -1,14 +1,12 @@
 <template>
     <div class="component flex items-center justify-between px-5">
         <div class="flex max-w-xs">
-            <img src="/music/AnotherOneBitesTheDust.jpg" alt="Img Song" width="70" height="70">
+            <img :src="currentSong.img"  alt="Img Song" width="70" height="70">
 
             <div class="flex items-center ml-4">
                 <div>
                     <p class="text-base font-semibold text-gray-100">{{currentSong.title}}</p>
-                    <!-- Tema {{song.title}} -->
                     <p class="text-xs font-normal text-white">{{currentSong.artist}}</p>
-                    <!-- Artista {{song.artist}}  -->
                 </div>
             </div>
 
@@ -26,31 +24,25 @@
                 <div class="mr-6">
                     <img src="/assets/Suffle.png" alt="Shuffle button" width="20" height="20" v-if="!shuffle" @click="shuffleToggle">
                     <img src="/assets/SuffleActivado.png" alt="Shuffle button" width="20" height="20" v-else @click="shuffleToggle">
-                    <!-- <i class="icon ion-ios-shuffle" ></i> -->
                 </div>
 
                 <div class="mr-6">
                     <img src="/assets/SkipBackward.png" alt="Skip Backward button" width="20" height="20" @click="skip('backward')">
-                    <!-- <i class="icon ion-ios-skip-backward" @click="skip('backward')"></i> -->
                 </div>
 
                 <div class="">
                     <img src="/assets/Play.png" alt="Shuffle button" width="35" height="35" v-if="!isPlaying" @click="playCurrentSong">
-                    <!-- <i class="icon ion-ios-play" v-if="!isPlaying" @click="playCurrentSong"></i> -->
                     <img src="/assets/Pause.png" alt="Shuffle button" width="35" height="35" v-else @click="pause">
-                    <!-- <i class="icon ion-ios-pause" v-else @click="pause"></i> -->
                 </div>
 
                 <div class="ml-6">
                     <img src="/assets/SkipForward.png" alt="Skip Forward button" width="20" height="20" @click="skip('forward')">
-                    <!-- <i class="icon ion-ios-skip-forward" @click="skip('forward')"></i> -->
                 </div>
 
                 <div class="flex ml-6">
                     <img src="/assets/Repeat.png" alt="Shuffle button" width="20" height="20" v-if="!onRepeat" @click="repeat">
                     <img src="/assets/RepeatActivado.png" alt="Shuffle button" width="20" height="20" v-else @click="repeat">
                     <div class="repeat-info h-3.5 w-3.5 rounded-full text-center text-white capitalize tracking-wide" v-if="onRepeat">{{loop.value}}</div>
-                    <!-- <i class="icon ion-ios-repeat" @click="repeat"></i> -->
                 </div>
             </div>
             <!-- Fin Botones -->
@@ -73,7 +65,7 @@
                 </div>
             </div>
 
-            <audio :loop="innerLoop" ref="audiofile" :src="defaultSong" preload style="display: none" controls></audio>
+            <audio :loop="innerLoop" ref="audiofile" :src="currentSong.song" preload style="display: none" controls></audio>
         </div>
 
         <div class="flex items-center mr-4">
@@ -94,6 +86,8 @@ export default {
         return {
             isLiked: false,
             isPlaying: false,
+            isLoaded: false,
+            isCurrentlyPlaying: "",
             onRepeat: false,
             shuffle: false,
 
@@ -102,27 +96,66 @@ export default {
             value: 1
             },
 
-            defaultSong:
-                "/music/AnotherOneBitesTheDust.mp3",
-            isLoaded: false,
-            isCurrentlyPlaying: "",
-
             durationSeconds: 0,
             currentSeconds: 0,
             audioPlayer: undefined,
             previousVolume: 35,
             volume: 100,
             autoPlay: false,
-            progressPercentageValue: 80,
+            progressPercentageValue: 0,
+
+            // currentSong: {
+            //     id: "",
+            //     title: "Another one bites the dust",
+            //     artist: "Queen",
+            //     album: "The Game",
+            //     song: "music/AnotherOneBitesTheDust.mp3",
+            //     img: "music/AnotherOneBitesTheDust.jpg"
+            // },
 
             currentSong: {
                 id: "",
-                title: "Another one bites the dust",
-                artist: "Queen",
+                title: "",
+                artist: "",
                 album: "",
-                url: "",
-                cover_art_url: ""
+                song: "",
+                img: ""
             },
+
+            playlist: {
+                currentIndex: 0,
+
+                songs: [
+                    {
+                        id: 1,
+                        title: "Desvelado",
+                        artist: "Bobby Pulido",
+                        album: "Desvelado",
+                        song: "/music/Desvelado.mp3",
+                        img: "/music/Desvelado.jpg"
+                    },
+                    {
+                        id: 2,
+                        title: "Another one bites the dust",
+                        artist: "Queen",
+                        album: "The Game",
+                        song: "/music/AnotherOneBitesTheDust.mp3",
+                        img: "/music/AnotherOneBitesTheDust.jpg"
+                    },
+                    {
+                        id: 3,
+                        title: "PamPam",
+                        artist: "Wisin & Yandel",
+                        album: "Pa'l mundo",
+                        song: "/music/PamPam.mp3",
+                        img: "/music/PamPam.jpg"
+                    }
+                ]
+            },
+            previousPlaylistIndex: 0,
+            hasNext: false,
+            originalSongArray: [],
+            showPlaylist: false
         }
     },
     created() {
@@ -168,6 +201,10 @@ export default {
             } else {
                 this.volume = 100;
             }
+        },
+        updateTimer() {
+            this.currentSeconds = parseInt(this.audioPlayer.currentTime);
+            this.progressPercentageValue = (this.currentSeconds / parseInt(this.audioPlayer.duration) * 100 || 0);
         },
         likeSong() {
             this.isLiked = this.isLiked ? false : true;
@@ -218,16 +255,20 @@ export default {
             }
         },
         shuffleToggle() {
-            this.shuffle = this.shuffle ? false : true;
-            // //shuffle the playlist songs and rearrange
-            // this.playlist.songs = this.shuffleArray(this.playlist.songs);
+            if (this.shuffle == false) {
+                this.shuffle = true;
+                //shuffle the playlist songs and rearrange
+                this.playlist.songs = this.shuffleArray(this.playlist.songs);
 
-            // //reset the playlist index when changed and rest the previous playlist index
-            // this.playlist.currentIndex = this.getObjectIndexFromArray(
-            //     this.currentSong,
-            //     this.playlist.songs
-            // );
-            // this.previousPlaylistIndex = this.playlist.currentIndex;
+                //reset the playlist index when changed and rest the previous playlist index
+                this.playlist.currentIndex = this.getObjectIndexFromArray(
+                    this.currentSong,
+                    this.playlist.songs
+                );
+                this.previousPlaylistIndex = this.playlist.currentIndex;
+            } else {
+                this.shuffle = false;
+            }
         },
         seek(e) {
             if (this.isLoaded) {
@@ -247,13 +288,12 @@ export default {
                 this.audioPlayer.currentTime = songPlayTimeAfterSeek;
 
                 this.progressPercentageValue = seekPosPercentage;
-                console.log(this.progressPercentageValue);
             } else {
                 throw new Error("Song Not Loaded");
             }
         },
         initPlayer() {
-            this.audioPlayer.src = this.playlist.songs[0].url;
+            this.audioPlayer.src = this.playlist.songs[0].song;
             this.setCurrentSong(this.playlist.songs[0]);
 
             this.audioPlayer.addEventListener("timeupdate", this.updateTimer);
@@ -309,23 +349,149 @@ export default {
             }
         },
         formatTime(secs) {
-        var minutes = Math.floor(secs / 60) || 0;
-        var seconds = Math.floor(secs - minutes * 60) || 0;
-        return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+            var minutes = Math.floor(secs / 60) || 0;
+            var seconds = Math.floor(secs - minutes * 60) || 0;
+            return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
         },
         setAudio(song) {
-        this.audioPlayer.src = song;
+            this.audioPlayer.src = song;
         },
         setCurrentSong(song) {
             this.currentSong.id = song.id;
             this.currentSong.title = song.title;
             this.currentSong.artist = song.artist;
             this.currentSong.album = song.album;
-            this.currentSong.url = song.url;
-            this.currentSong.cover_art_url = song.cover_art_url;
+            this.currentSong.song = song.song;
+            this.currentSong.img = song.img;
 
             this.previousPlaylistIndex = this.playlist.currentIndex;
+            console.log(this.currentSong);
         },
+        addAndPlayNext() {
+            let selectedSong = {
+                title: "Song Name 3",
+                artist: "Artist Name",
+                album: "Album Name",
+                url: "./song2.mp3",
+                cover_art_url: "/cover/art/url.jpg",
+                isPlaying: false
+            };
+
+            //add the song to the playlist
+
+            //get the index of the song that is currently being played in the player
+
+            //insert the song at that position
+
+            let indexOfCurrentSong = this.playlist.currentIndex;
+
+            this.playlist.songs.splice(indexOfCurrentSong + 1, 0, selectedSong);
+        },
+        addToPlaylist(song) {
+            this.playlist.songs.unshift(song);
+        },
+        dragSeek(e) {
+            let el = e.target.getBoundingClientRect();
+        },
+        playNextSongInPlaylist() {
+            if (this.onRepeat && this.loop.value === 1) {
+                this.audioPlayer.play();
+            } else {
+                if (this.playlist.songs.length > 1) {
+                    if (this.random) {
+                        //generate a random number
+                        let randomNumber = this.generateRandomNumber(
+                        0,
+                        this.playlist.songs.length - 1,
+                        this.previousPlaylistIndex
+                        );
+
+                        //set the current index of the playlist
+                        this.playlist.currentIndex = randomNumber;
+
+                        //set the src of the audio player
+                        this.audioPlayer.src = this.playlist.songs[
+                        this.playlist.currentIndex
+                        ].url;
+                        //set the current song
+                        this.setCurrentSong(
+                        this.playlist.songs[this.playlist.currentIndex]
+                        );
+                        //begin to play
+                        this.audioPlayer.play();
+                    } else {
+                        /**if the current Index of the playlist is equal to the index of the last song played skip that song and add 1*/
+
+                        if (this.playlist.currentIndex === this.previousPlaylistIndex) {
+                        //increment the current index of the playlist by 1
+                        this.playlist.currentIndex += 1;
+                        }
+
+                        /**if the current Index of the playlist is greater or equal to the length of the playlist songs (the index is out of range)
+                         reset the index to 0. It could also mean that the playlist is at its end. */
+
+                        if (this.playlist.currentIndex >= this.playlist.songs.length) {
+                        if (this.onRepeat && this.loop.value === "all") {
+                            //if repeat is on then replay from the top
+                            this.playlist.currentIndex = 0;
+                        } else {
+                            return;
+                        }
+                        }
+
+                        this.audioPlayer.src = this.playlist.songs[
+                        this.playlist.currentIndex
+                        ].url;
+                        this.setCurrentSong(
+                        this.playlist.songs[this.playlist.currentIndex]
+                        );
+                        this.audioPlayer.play();
+                        this.playlist.currentIndex++;
+                    }
+                } else {
+                }
+            }
+        },
+        containsObjectWithSameId(obj, list) {
+            let i;
+            for (i = 0; i < list.length; i++) {
+                if (list[i].id === obj.id) {
+                return true;
+                }
+            }
+        },
+        getObjectIndexFromArray(obj, list) {
+            //this function just returns the index of the item with the id
+            let i;
+            for (i = 0; i < list.length; i++) {
+                if (list[i].id === obj.id) {
+                return i;
+                }
+            }
+        },
+        generateRandomNumber(min, max, except) {
+            let num = null;
+            num = Math.floor(Math.random() * (max - min + 1)) + min;
+            return num === except ? this.generateRandomNumber(min, max, except) : num;
+        },
+        shuffleArray(array) {
+            let ctr = array.length;
+            let temp;
+            let index;
+
+            // While there are elements in the array
+            while (ctr > 0) {
+                // Pick a random index
+                index = Math.floor(Math.random() * ctr);
+                // Decrease ctr by 1
+                ctr--;
+                // And swap the last element with it
+                temp = array[ctr];
+                array[ctr] = array[index];
+                array[index] = temp;
+            }
+            return array;
+        }
     }
 }
 </script>
