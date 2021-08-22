@@ -1,6 +1,17 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./node_modules/@babel/runtime/regenerator/index.js":
+/*!**********************************************************!*\
+  !*** ./node_modules/@babel/runtime/regenerator/index.js ***!
+  \**********************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+module.exports = __webpack_require__(/*! regenerator-runtime */ "./node_modules/regenerator-runtime/runtime.js");
+
+
+/***/ }),
+
 /***/ "./node_modules/@inertiajs/inertia-vue3/dist/index.js":
 /*!************************************************************!*\
   !*** ./node_modules/@inertiajs/inertia-vue3/dist/index.js ***!
@@ -21300,30 +21311,66 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     return {
       isLiked: false,
       isPlaying: false,
+      isLoaded: false,
+      isCurrentlyPlaying: "",
       onRepeat: false,
       shuffle: false,
       loop: {
         state: false,
         value: 1
       },
-      defaultSong: "music/AnotherOneBitesTheDust.mp3",
-      isLoaded: false,
-      isCurrentlyPlaying: "",
       durationSeconds: 0,
       currentSeconds: 0,
       audioPlayer: undefined,
       previousVolume: 35,
       volume: 100,
       autoPlay: false,
-      progressPercentageValue: 80,
+      progressPercentageValue: 0,
+      // currentSong: {
+      //     id: "",
+      //     title: "Another one bites the dust",
+      //     artist: "Queen",
+      //     album: "The Game",
+      //     song: "music/AnotherOneBitesTheDust.mp3",
+      //     img: "music/AnotherOneBitesTheDust.jpg"
+      // },
       currentSong: {
         id: "",
-        title: "Another one bites the dust",
-        artist: "Queen",
+        title: "",
+        artist: "",
         album: "",
-        url: "",
-        cover_art_url: ""
-      }
+        song: "",
+        img: ""
+      },
+      playlist: {
+        currentIndex: 0,
+        songs: [{
+          id: 1,
+          title: "Desvelado",
+          artist: "Bobby Pulido",
+          album: "Desvelado",
+          song: "/music/Desvelado.mp3",
+          img: "/music/Desvelado.jpg"
+        }, {
+          id: 2,
+          title: "Another one bites the dust",
+          artist: "Queen",
+          album: "The Game",
+          song: "/music/AnotherOneBitesTheDust.mp3",
+          img: "/music/AnotherOneBitesTheDust.jpg"
+        }, {
+          id: 3,
+          title: "PamPam",
+          artist: "Wisin & Yandel",
+          album: "Pa'l mundo",
+          song: "/music/PamPam.mp3",
+          img: "/music/PamPam.jpg"
+        }]
+      },
+      previousPlaylistIndex: 0,
+      hasNext: false,
+      originalSongArray: [],
+      showPlaylist: false
     };
   },
   created: function created() {
@@ -21369,6 +21416,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       } else {
         this.volume = 100;
       }
+    },
+    updateTimer: function updateTimer() {
+      this.currentSeconds = parseInt(this.audioPlayer.currentTime);
+      this.progressPercentageValue = this.currentSeconds / parseInt(this.audioPlayer.duration) * 100 || 0;
     },
     likeSong: function likeSong() {
       this.isLiked = this.isLiked ? false : true;
@@ -21416,14 +21467,16 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       }
     },
     shuffleToggle: function shuffleToggle() {
-      this.shuffle = this.shuffle ? false : true; // //shuffle the playlist songs and rearrange
-      // this.playlist.songs = this.shuffleArray(this.playlist.songs);
-      // //reset the playlist index when changed and rest the previous playlist index
-      // this.playlist.currentIndex = this.getObjectIndexFromArray(
-      //     this.currentSong,
-      //     this.playlist.songs
-      // );
-      // this.previousPlaylistIndex = this.playlist.currentIndex;
+      if (this.shuffle == false) {
+        this.shuffle = true; //shuffle the playlist songs and rearrange
+
+        this.playlist.songs = this.shuffleArray(this.playlist.songs); //reset the playlist index when changed and rest the previous playlist index
+
+        this.playlist.currentIndex = this.getObjectIndexFromArray(this.currentSong, this.playlist.songs);
+        this.previousPlaylistIndex = this.playlist.currentIndex;
+      } else {
+        this.shuffle = false;
+      }
     },
     seek: function seek(e) {
       if (this.isLoaded) {
@@ -21438,7 +21491,6 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         var songPlayTimeAfterSeek = parseInt(this.audioPlayer.duration * seekPos);
         this.audioPlayer.currentTime = songPlayTimeAfterSeek;
         this.progressPercentageValue = seekPosPercentage;
-        console.log(this.progressPercentageValue);
       } else {
         throw new Error("Song Not Loaded");
       }
@@ -21446,7 +21498,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     initPlayer: function initPlayer() {
       var _this = this;
 
-      this.audioPlayer.src = this.playlist.songs[0].url;
+      this.audioPlayer.src = this.playlist.songs[0].song;
       this.setCurrentSong(this.playlist.songs[0]);
       this.audioPlayer.addEventListener("timeupdate", this.updateTimer);
       this.audioPlayer.addEventListener("loadeddata", this.load);
@@ -21512,10 +21564,171 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       this.currentSong.title = song.title;
       this.currentSong.artist = song.artist;
       this.currentSong.album = song.album;
-      this.currentSong.url = song.url;
-      this.currentSong.cover_art_url = song.cover_art_url;
+      this.currentSong.song = song.song;
+      this.currentSong.img = song.img;
       this.previousPlaylistIndex = this.playlist.currentIndex;
+      console.log(this.currentSong);
+    },
+    addAndPlayNext: function addAndPlayNext() {
+      var selectedSong = {
+        title: "Song Name 3",
+        artist: "Artist Name",
+        album: "Album Name",
+        url: "./song2.mp3",
+        cover_art_url: "/cover/art/url.jpg",
+        isPlaying: false
+      }; //add the song to the playlist
+      //get the index of the song that is currently being played in the player
+      //insert the song at that position
+
+      var indexOfCurrentSong = this.playlist.currentIndex;
+      this.playlist.songs.splice(indexOfCurrentSong + 1, 0, selectedSong);
+    },
+    addToPlaylist: function addToPlaylist(song) {
+      this.playlist.songs.unshift(song);
+    },
+    dragSeek: function dragSeek(e) {
+      var el = e.target.getBoundingClientRect();
+    },
+    playNextSongInPlaylist: function playNextSongInPlaylist() {
+      if (this.onRepeat && this.loop.value === 1) {
+        this.audioPlayer.play();
+      } else {
+        if (this.playlist.songs.length > 1) {
+          if (this.random) {
+            //generate a random number
+            var randomNumber = this.generateRandomNumber(0, this.playlist.songs.length - 1, this.previousPlaylistIndex); //set the current index of the playlist
+
+            this.playlist.currentIndex = randomNumber; //set the src of the audio player
+
+            this.audioPlayer.src = this.playlist.songs[this.playlist.currentIndex].url; //set the current song
+
+            this.setCurrentSong(this.playlist.songs[this.playlist.currentIndex]); //begin to play
+
+            this.audioPlayer.play();
+          } else {
+            /**if the current Index of the playlist is equal to the index of the last song played skip that song and add 1*/
+            if (this.playlist.currentIndex === this.previousPlaylistIndex) {
+              //increment the current index of the playlist by 1
+              this.playlist.currentIndex += 1;
+            }
+            /**if the current Index of the playlist is greater or equal to the length of the playlist songs (the index is out of range)
+             reset the index to 0. It could also mean that the playlist is at its end. */
+
+
+            if (this.playlist.currentIndex >= this.playlist.songs.length) {
+              if (this.onRepeat && this.loop.value === "all") {
+                //if repeat is on then replay from the top
+                this.playlist.currentIndex = 0;
+              } else {
+                return;
+              }
+            }
+
+            this.audioPlayer.src = this.playlist.songs[this.playlist.currentIndex].url;
+            this.setCurrentSong(this.playlist.songs[this.playlist.currentIndex]);
+            this.audioPlayer.play();
+            this.playlist.currentIndex++;
+          }
+        } else {}
+      }
+    },
+    containsObjectWithSameId: function containsObjectWithSameId(obj, list) {
+      var i;
+
+      for (i = 0; i < list.length; i++) {
+        if (list[i].id === obj.id) {
+          return true;
+        }
+      }
+    },
+    getObjectIndexFromArray: function getObjectIndexFromArray(obj, list) {
+      //this function just returns the index of the item with the id
+      var i;
+
+      for (i = 0; i < list.length; i++) {
+        if (list[i].id === obj.id) {
+          return i;
+        }
+      }
+    },
+    generateRandomNumber: function generateRandomNumber(min, max, except) {
+      var num = null;
+      num = Math.floor(Math.random() * (max - min + 1)) + min;
+      return num === except ? this.generateRandomNumber(min, max, except) : num;
+    },
+    shuffleArray: function shuffleArray(array) {
+      var ctr = array.length;
+      var temp;
+      var index; // While there are elements in the array
+
+      while (ctr > 0) {
+        // Pick a random index
+        index = Math.floor(Math.random() * ctr); // Decrease ctr by 1
+
+        ctr--; // And swap the last element with it
+
+        temp = array[ctr];
+        array[ctr] = array[index];
+        array[index] = temp;
+      }
+
+      return array;
     }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=script&lang=js":
+/*!***********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=script&lang=js ***!
+  \***********************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'PlaylistDetail',
+  props: {
+    playlists: Object
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/Playlists.vue?vue&type=script&lang=js":
+/*!******************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/Playlists.vue?vue&type=script&lang=js ***!
+  \******************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _Pages_Components_sidebar_SideBar_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/Pages/Components/sidebar/SideBar.vue */ "./resources/js/Pages/Components/sidebar/SideBar.vue");
+/* harmony import */ var _Pages_Components_playlist_PlaylistDetail_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/Pages/Components/playlist/PlaylistDetail.vue */ "./resources/js/Pages/Components/playlist/PlaylistDetail.vue");
+/* harmony import */ var _Pages_Components_footer_MusicPlayer_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/Pages/Components/footer/MusicPlayer.vue */ "./resources/js/Pages/Components/footer/MusicPlayer.vue");
+/* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
+
+
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  name: 'Playlist',
+  props: {
+    playlists: Object
+  },
+  components: {
+    SideBar: _Pages_Components_sidebar_SideBar_vue__WEBPACK_IMPORTED_MODULE_0__.default,
+    PlaylistDetail: _Pages_Components_playlist_PlaylistDetail_vue__WEBPACK_IMPORTED_MODULE_1__.default,
+    MusicPlayer: _Pages_Components_footer_MusicPlayer_vue__WEBPACK_IMPORTED_MODULE_2__.default
   }
 });
 
@@ -21551,60 +21764,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'Playlists',
+  props: ['playlists'],
   data: function data() {
-    return {
-      playlists: [{
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }, {
-        'name': 'Playlist1'
-      }]
-    };
+    return {};
   }
 });
 
@@ -21621,26 +21783,63 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
-/* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
-/* harmony import */ var _Playlists_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Playlists.vue */ "./resources/js/Pages/Components/sidebar/Playlists.vue");
-/* harmony import */ var _Navigation_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Navigation.vue */ "./resources/js/Pages/Components/sidebar/Navigation.vue");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
+/* harmony import */ var _inertiajs_inertia__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @inertiajs/inertia */ "./node_modules/@inertiajs/inertia/dist/index.js");
+/* harmony import */ var _Playlists_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Playlists.vue */ "./resources/js/Pages/Components/sidebar/Playlists.vue");
+/* harmony import */ var _Navigation_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Navigation.vue */ "./resources/js/Pages/Components/sidebar/Navigation.vue");
+
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+
+
 
 
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'SideBar',
-  props: ['users'],
+  props: {
+    posts: Array
+  },
   components: {
-    Playlists: _Playlists_vue__WEBPACK_IMPORTED_MODULE_2__.default,
-    Navigation: _Navigation_vue__WEBPACK_IMPORTED_MODULE_3__.default
-  } // setup(props) {
-  //     const user = props.usersList;
-  //     console.log(props)
-  //     return { user }
-  // }
+    Playlists: _Playlists_vue__WEBPACK_IMPORTED_MODULE_5__.default,
+    Navigation: _Navigation_vue__WEBPACK_IMPORTED_MODULE_6__.default
+  },
+  setup: function setup() {
+    var playlists = (0,vue__WEBPACK_IMPORTED_MODULE_1__.ref)(null);
+    (0,vue__WEBPACK_IMPORTED_MODULE_1__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+      var response;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.next = 2;
+              return axios__WEBPACK_IMPORTED_MODULE_2___default().get('/playlists');
 
+            case 2:
+              response = _context.sent;
+              playlists.value = response.data;
+
+            case 4:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    }))); // console.log(playlists);
+
+    return {
+      playlists: playlists
+    };
+  }
 });
 
 /***/ }),
@@ -25573,16 +25772,7 @@ var _hoisted_1 = {
 var _hoisted_2 = {
   "class": "flex max-w-xs"
 };
-
-var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-  src: "music/AnotherOneBitesTheDust.jpg",
-  alt: "Img Song",
-  width: "70",
-  height: "70"
-}, null, -1
-/* HOISTED */
-);
-
+var _hoisted_3 = ["src"];
 var _hoisted_4 = {
   "class": "flex items-center ml-4"
 };
@@ -25643,13 +25833,20 @@ var _hoisted_22 = {
 (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)();
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [_hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.currentSong.title), 1
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: $data.currentSong.img,
+    alt: "Img Song",
+    width: "70",
+    height: "70"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_3), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.currentSong.title), 1
   /* TEXT */
-  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Tema {{song.title}} "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.currentSong.artist), 1
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.currentSong.artist), 1
   /* TEXT */
-  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Artista {{song.artist}}  ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [!$data.isLiked ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
+  )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [!$data.isLiked ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
     key: 0,
-    src: "assets/Corazon.png",
+    src: "/assets/Corazon.png",
     alt: "Img Song",
     width: "20",
     height: "20",
@@ -25658,7 +25855,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
     key: 1,
-    src: "assets/CorazonColoreado.png",
+    src: "/assets/CorazonColoreado.png",
     alt: "Img Song",
     width: "20",
     height: "20",
@@ -25667,7 +25864,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }))])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Inicio Botones "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [!$data.shuffle ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
     key: 0,
-    src: "assets/Suffle.png",
+    src: "/assets/Suffle.png",
     alt: "Shuffle button",
     width: "20",
     height: "20",
@@ -25676,53 +25873,50 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
     key: 1,
-    src: "assets/SuffleActivado.png",
+    src: "/assets/SuffleActivado.png",
     alt: "Shuffle button",
     width: "20",
     height: "20",
     onClick: _cache[3] || (_cache[3] = function () {
       return $options.shuffleToggle && $options.shuffleToggle.apply($options, arguments);
     })
-  })), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-shuffle\" ></i> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-    src: "assets/SkipBackward.png",
+  }))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: "/assets/SkipBackward.png",
     alt: "Skip Backward button",
     width: "20",
     height: "20",
     onClick: _cache[4] || (_cache[4] = function ($event) {
       return $options.skip('backward');
     })
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-skip-backward\" @click=\"skip('backward')\"></i> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [!$data.isPlaying ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
+  })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [!$data.isPlaying ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
     key: 0,
-    src: "assets/Play.png",
+    src: "/assets/Play.png",
     alt: "Shuffle button",
     width: "35",
     height: "35",
     onClick: _cache[5] || (_cache[5] = function () {
       return $options.playCurrentSong && $options.playCurrentSong.apply($options, arguments);
     })
-  })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    key: 1
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-play\" v-if=\"!isPlaying\" @click=\"playCurrentSong\"></i> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-    src: "assets/Pause.png",
+  })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
+    key: 1,
+    src: "/assets/Pause.png",
     alt: "Shuffle button",
     width: "35",
     height: "35",
     onClick: _cache[6] || (_cache[6] = function () {
       return $options.pause && $options.pause.apply($options, arguments);
     })
-  })], 2112
-  /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
-  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-pause\" v-else @click=\"pause\"></i> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-    src: "assets/SkipForward.png",
+  }))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: "/assets/SkipForward.png",
     alt: "Skip Forward button",
     width: "20",
     height: "20",
     onClick: _cache[7] || (_cache[7] = function ($event) {
       return $options.skip('forward');
     })
-  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-skip-forward\" @click=\"skip('forward')\"></i> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [!$data.onRepeat ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
+  })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [!$data.onRepeat ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
     key: 0,
-    src: "assets/Repeat.png",
+    src: "/assets/Repeat.png",
     alt: "Shuffle button",
     width: "20",
     height: "20",
@@ -25731,7 +25925,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
     key: 1,
-    src: "assets/RepeatActivado.png",
+    src: "/assets/RepeatActivado.png",
     alt: "Shuffle button",
     width: "20",
     height: "20",
@@ -25740,7 +25934,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   })), $data.onRepeat ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.loop.value), 1
   /* TEXT */
-  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <i class=\"icon ion-ios-repeat\" @click=\"repeat\"></i> ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Fin Botones "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.currentPlayedTime), 1
+  )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Fin Botones "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.currentPlayedTime), 1
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 00:00 ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" w-96 "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
@@ -25754,7 +25948,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 00:00 ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("audio", {
     loop: _ctx.innerLoop,
     ref: "audiofile",
-    src: $data.defaultSong,
+    src: $data.currentSong.song,
     preload: "",
     style: {
       "display": "none"
@@ -25764,7 +25958,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* PROPS */
   , _hoisted_20)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [$data.volume == 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
     key: 0,
-    src: "assets/Mute.png",
+    src: "/assets/Mute.png",
     alt: "Shuffle button",
     "class": "mr-2",
     width: "20",
@@ -25774,7 +25968,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
     key: 1,
-    src: "assets/Volume.png",
+    src: "/assets/Volume.png",
     alt: "Shuffle button",
     "class": "mr-2",
     width: "20",
@@ -25790,6 +25984,205 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 4
   /* STYLE */
   )])])]);
+}
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=template&id=7bd0daa0&scoped=true":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=template&id=7bd0daa0&scoped=true ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+
+(0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-7bd0daa0");
+
+var _hoisted_1 = {
+  "class": "scroll flex flex-col bg-black"
+};
+var _hoisted_2 = {
+  "class": "p-10 flex flex-row"
+};
+var _hoisted_3 = ["src"];
+var _hoisted_4 = {
+  "class": "ml-8 flex flex-col h-48 "
+};
+
+var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+  "class": "text-white text-blond text-base"
+}, "PLAYLIST", -1
+/* HOISTED */
+);
+
+var _hoisted_6 = {
+  "class": "text-white text-blond text-5xl"
+};
+var _hoisted_7 = {
+  "class": "flex flex-col "
+};
+
+var _hoisted_8 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"flex flex-row py-2 px-8 items-center\" data-v-7bd0daa0><div class=\"bg-white rounded-full\" data-v-7bd0daa0><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"60\" height=\"60\" class=\"bi bi-play-circle-fill fill-current green\" viewBox=\"0 0 16 16\" data-v-7bd0daa0><path d=\"M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z\" data-v-7bd0daa0></path></svg></div><div class=\"mx-10\" data-v-7bd0daa0><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"30\" height=\"30\" class=\"bi bi-heart-fill fill-current green\" viewBox=\"0 0 16 16\" data-v-7bd0daa0><path fill-rule=\"evenodd\" d=\"M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z\" data-v-7bd0daa0></path></svg></div></div>", 1);
+
+var _hoisted_9 = {
+  "class": "flex flex-col"
+};
+var _hoisted_10 = {
+  "class": "py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8"
+};
+var _hoisted_11 = {
+  "class": "shadow "
+};
+var _hoisted_12 = {
+  "class": "min-w-full divide-y divide-gray-800"
+};
+
+var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", {
+  "class": "bg-black"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  scope: "col",
+  "class": "relative px-6 py-3 text-white"
+}, " # "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  scope: "col",
+  "class": "px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
+}, " Título "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  scope: "col",
+  "class": "px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
+}, " Álbum "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  scope: "col",
+  "class": "px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
+}, " Fecha Incorporación "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("th", {
+  scope: "col",
+  "class": "px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
+}, " Role ")])], -1
+/* HOISTED */
+);
+
+var _hoisted_14 = {
+  "class": "bg-black divide-y divide-gray-800"
+};
+var _hoisted_15 = {
+  "class": "px-6 py-4 whitespace-nowrap text-sm text-white text-opacity-75"
+};
+var _hoisted_16 = {
+  "class": "px-6 py-4 whitespace-nowrap"
+};
+var _hoisted_17 = {
+  "class": "flex items-center"
+};
+var _hoisted_18 = {
+  "class": "flex-shrink-0 h-10 w-10"
+};
+var _hoisted_19 = ["src"];
+var _hoisted_20 = {
+  "class": "ml-4"
+};
+var _hoisted_21 = {
+  "class": "text-sm text-blond font-medium text-white "
+};
+var _hoisted_22 = {
+  "class": "text-sm text-white text-opacity-75"
+};
+var _hoisted_23 = {
+  "class": "px-6 py-4 whitespace-nowrap"
+};
+var _hoisted_24 = {
+  "class": "text-sm text-white text-opacity-75"
+};
+var _hoisted_25 = {
+  "class": "px-6 py-4 whitespace-nowrap text-sm text-white text-opacity-75"
+};
+
+var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+  "class": "px-6 py-4 whitespace-nowrap text-sm text-white text-opacity-75"
+}, " 2:30 ", -1
+/* HOISTED */
+);
+
+(0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)();
+
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: $props.playlists.url_image,
+    alt: "",
+    srcset: "",
+    "class": "h-48 w-48"
+  }, null, 8
+  /* PROPS */
+  , _hoisted_3)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [_hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.playlists.name), 1
+  /* TEXT */
+  )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [_hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_12, [_hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", _hoisted_14, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.playlists.songs, function (song) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
+      key: song.id
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(song.id), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+      "class": "h-10 w-10 rounded-full",
+      src: song.url_image,
+      alt: ""
+    }, null, 8
+    /* PROPS */
+    , _hoisted_19)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(song.title), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(song.artist), 1
+    /* TEXT */
+    )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(song.album), 1
+    /* TEXT */
+    ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"text-sm text-white text-opacity-75\">Optimization</div> ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(song.created_at), 1
+    /* TEXT */
+    ), _hoisted_26]);
+  }), 128
+  /* KEYED_FRAGMENT */
+  ))])])])])])])]);
+}
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/Playlists.vue?vue&type=template&id=4fbe8904":
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/Playlists.vue?vue&type=template&id=4fbe8904 ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+var _hoisted_1 = {
+  "class": "h-screen flex flex-col"
+};
+var _hoisted_2 = {
+  "class": "h-5/6 flex flex-row"
+};
+var _hoisted_3 = {
+  "class": "h-1/6 "
+};
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_side_bar = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("side-bar");
+
+  var _component_playlist_detail = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("playlist-detail");
+
+  var _component_music_player = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("music-player");
+
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_side_bar, {
+    "class": "w-1/5"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_playlist_detail, {
+    playlists: $props.playlists,
+    "class": "w-4/5"
+  }, null, 8
+  /* PROPS */
+  , ["playlists"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_music_player, {
+    "class": "w-full h-full"
+  })])]);
 }
 
 /***/ }),
@@ -25810,14 +26203,38 @@ __webpack_require__.r(__webpack_exports__);
 
 (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-0bcd8987");
 
-var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div data-v-0bcd8987><img src=\"assets/spotify.png\" width=\"175\" height=\"40\" alt=\"\" srcset=\"\" data-v-0bcd8987></div><div class=\"flex flex-row place-items-center my-2\" data-v-0bcd8987><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6 mx-2\" viewBox=\"0 0 20 20\" fill=\"white\" data-v-0bcd8987><path d=\"M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z\" data-v-0bcd8987></path></svg><span class=\"text-md text-white ml-2\" data-v-0bcd8987>Inicio</span></div><div class=\"flex flex-row place-items-center my-2\" data-v-0bcd8987><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6 mx-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"white\" data-v-0bcd8987><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z\" data-v-0bcd8987></path></svg><span class=\"text-md text-white ml-2\" data-v-0bcd8987>Buscar</span></div><div class=\"flex flex-row place-items-center my-2\" data-v-0bcd8987><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6 mx-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"white\" data-v-0bcd8987><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253\" data-v-0bcd8987></path></svg><span class=\"text-md text-white ml-2\" data-v-0bcd8987>Tu biblioteca</span></div><div class=\"flex flex-row place-items-center mt-5\" data-v-0bcd8987><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" fill=\"white\" class=\"bi bi-plus-square-fill mx-3\" viewBox=\"0 0 16 16\" data-v-0bcd8987><path d=\"M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0z\" data-v-0bcd8987></path></svg><span class=\"text-md text-white ml-2\" data-v-0bcd8987>Crear Lista</span></div><div class=\"flex flex-row place-items-center my-2\" data-v-0bcd8987><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" fill=\"white\" class=\"bi bi-heart-fill mx-3\" viewBox=\"0 0 16 16\" data-v-0bcd8987><path fill-rule=\"evenodd\" d=\"M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z\" data-v-0bcd8987></path></svg><span class=\"text-md text-white ml-2\" data-v-0bcd8987>Canciones que te gustan</span></div>", 6);
+var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+  src: "/assets/spotify.png",
+  width: "175",
+  height: "40",
+  alt: "",
+  srcset: ""
+})], -1
+/* HOISTED */
+);
 
-var _hoisted_7 = [_hoisted_1];
+var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+  href: '/dashboard',
+  "class": "flex flex-row place-items-center my-2"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  "class": "h-6 w-6 mx-2",
+  viewBox: "0 0 20 20",
+  fill: "white"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  d: "M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"
+})]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "text-md text-white ml-2"
+}, "Inicio")], -1
+/* HOISTED */
+);
+
+var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"flex flex-row place-items-center my-2\" data-v-0bcd8987><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6 mx-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"white\" data-v-0bcd8987><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z\" data-v-0bcd8987></path></svg><span class=\"text-md text-white ml-2\" data-v-0bcd8987>Buscar</span></div><div class=\"flex flex-row place-items-center my-2\" data-v-0bcd8987><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"h-6 w-6 mx-2\" fill=\"none\" viewBox=\"0 0 24 24\" stroke=\"white\" data-v-0bcd8987><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253\" data-v-0bcd8987></path></svg><span class=\"text-md text-white ml-2\" data-v-0bcd8987>Tu biblioteca</span></div><div class=\"flex flex-row place-items-center mt-5\" data-v-0bcd8987><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" fill=\"white\" class=\"bi bi-plus-square-fill mx-3\" viewBox=\"0 0 16 16\" data-v-0bcd8987><path d=\"M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0z\" data-v-0bcd8987></path></svg><span class=\"text-md text-white ml-2\" data-v-0bcd8987>Crear Lista</span></div><div class=\"flex flex-row place-items-center my-2\" data-v-0bcd8987><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" fill=\"white\" class=\"bi bi-heart-fill mx-3\" viewBox=\"0 0 16 16\" data-v-0bcd8987><path fill-rule=\"evenodd\" d=\"M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z\" data-v-0bcd8987></path></svg><span class=\"text-md text-white ml-2\" data-v-0bcd8987>Canciones que te gustan</span></div>", 4);
 
 (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)();
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, _hoisted_7);
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [_hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"flex flex-row place-items-center my-2\"> "), _hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" </div> "), _hoisted_3]);
 }
 
 /***/ }),
@@ -25845,7 +26262,7 @@ var _hoisted_1 = {
 (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)();
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.playlists, function (playlist) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.playlists, function (playlist) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
       key: playlist.id,
       "class": "text-white text-opacity-75 m-2 text-sm"
@@ -25893,11 +26310,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   var _component_playlists = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("playlists");
 
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" {{users}} "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_navigation, {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" {{$page['props']}} "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_navigation, {
     "class": "mb-4"
   }), _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_playlists, {
-    "class": "mt-4"
-  })])]);
+    "class": "mt-4",
+    playlists: $setup.playlists
+  }, null, 8
+  /* PROPS */
+  , ["playlists"])])]);
 }
 
 /***/ }),
@@ -25937,7 +26357,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "w-4/5"
   })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_music_player, {
     "class": "w-full h-full"
-  })])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <app-layout title=\"Dashboard\" >\r\n        <template #header>\r\n            <h2 class=\"font-semibold text-xl text-gray-800 leading-tight\">\r\n                Dashboard\r\n            </h2>\r\n        </template>\r\n\r\n        <div class=\"py-12\">\r\n            <div class=\"max-w-7xl mx-auto sm:px-6 lg:px-8\">\r\n                <div class=\"bg-white overflow-hidden shadow-xl sm:rounded-lg\">\r\n                    <welcome />\r\n                </div>\r\n            </div>\r\n        </div>\r\n\r\n    </app-layout> ")], 2112
+  })])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <app-layout title=\"Dashboard\" >\n        <template #header>\n            <h2 class=\"font-semibold text-xl text-gray-800 leading-tight\">\n                Dashboard\n            </h2>\n        </template>\n\n        <div class=\"py-12\">\n            <div class=\"max-w-7xl mx-auto sm:px-6 lg:px-8\">\n                <div class=\"bg-white overflow-hidden shadow-xl sm:rounded-lg\">\n                </div>\n            </div>\n        </div>\n\n    </app-layout> ")], 2112
   /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
   );
 }
@@ -27326,11 +27746,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-<<<<<<< HEAD
-___CSS_LOADER_EXPORT___.push([module.id, "\n.flex[data-v-a2ac2cea]{\n    display: flex;\n    font-size: 30px;\n}\n.logo[data-v-a2ac2cea]{\n    width: 5%;\n    padding: 5px;\n    justify-content: center;\n}\n.cont-header[data-v-a2ac2cea]{\n    border-bottom: 1px solid #d9dadc;\n    padding: 25px 0 10px;\n    justify-content: center;\n    width: 100%;\n}\nheader[data-v-a2ac2cea]{\n    position:fixed;\n}\n\n", ""]);
-=======
-___CSS_LOADER_EXPORT___.push([module.id, "\n.flex[data-v-a2ac2cea]{\r\n    display: flex;\r\n    font-size: 30px;\n}\n.logo[data-v-a2ac2cea]{\r\n    width: 5%;\r\n    padding: 5px;\r\n    justify-content: center;\n}\n.cont-header[data-v-a2ac2cea]{\r\n    border-bottom: 1px solid #d9dadc;\r\n    padding: 25px 0 10px;\r\n    justify-content: center;\r\n    width: 100%;\n}\nheader[data-v-a2ac2cea]{\r\n    position:fixed;\n}\n.login-container[data-v-a2ac2cea]{\r\n    height: 520px;\r\n    width: 420px;\r\n    background: #000;\r\n    color: #fff;\r\n    top: 50%;\r\n    left: 50%;\r\n    position: fixed;\r\n    transform: translate(-50%, -50%);\r\n    box-sizing: border-box;\r\n    border-radius: 5%;\r\n    padding: 70px 30px;\n}\n.login-container h1[data-v-a2ac2cea]{\r\n    margin: 0;\r\n    padding: 0 0 50px;\r\n    text-align: center;\r\n    font-size: 22px;\n}\n#email[data-v-a2ac2cea], #password[data-v-a2ac2cea]{\r\n    background-color: #000;\r\n    border: none;\r\n    border-bottom: 1px solid #fff;\r\n    background: transparent;\r\n    outline: none;\n}\n.email-label[data-v-a2ac2cea], .pass-label[data-v-a2ac2cea]{\r\n    margin: 0;\r\n    padding: 0;\r\n    font-weight: bold;\r\n    display: block;\r\n    color: #fff;\n}\r\n", ""]);
->>>>>>> 3177e50732f29942c7f418f4ae0452bddb9f6b78
+___CSS_LOADER_EXPORT___.push([module.id, "\n.flex[data-v-a2ac2cea]{\r\n    display: flex;\r\n    font-size: 30px;\n}\n.logo[data-v-a2ac2cea]{\r\n    width: 5%;\r\n    padding: 5px;\r\n    justify-content: center;\n}\n.cont-header[data-v-a2ac2cea]{\r\n    border-bottom: 1px solid #d9dadc;\r\n    padding: 25px 0 10px;\r\n    justify-content: center;\r\n    width: 100%;\n}\nheader[data-v-a2ac2cea]{\r\n    position:fixed;\n}\r\n\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -27354,11 +27770,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-<<<<<<< HEAD
-___CSS_LOADER_EXPORT___.push([module.id, "\n.flex[data-v-e59c811e]{\n    display: flex;\n    font-size: 30px;\n}\n.logo[data-v-e59c811e]{\n    width: 5%;\n    padding: 5px;\n    justify-content: center;\n}\n.cont-header[data-v-e59c811e]{\n    border-bottom: 1px solid #d9dadc;\n    padding: 25px 0 10px;\n    justify-content: center;\n    width: 100%;\n}\nheader[data-v-e59c811e]{\n    position:fixed;\n}\n\n", ""]);
-=======
-___CSS_LOADER_EXPORT___.push([module.id, "\n.flex[data-v-e59c811e]{\r\n    display: flex;\r\n    font-size: 30px;\n}\n.logo[data-v-e59c811e]{\r\n    width: 5%;\r\n    padding: 5px;\r\n    justify-content: center;\n}\n.cont-header[data-v-e59c811e]{\r\n    border-bottom: 1px solid #d9dadc;\r\n    padding: 25px 0 10px;\r\n    justify-content: center;\r\n    width: 100%;\n}\nheader[data-v-e59c811e]{\r\n    position:fixed;\n}\n.register-container[data-v-e59c811e]{\r\n    height: 520px;\r\n    width: 420px;\r\n    background: #000;\r\n    color: #fff;\r\n    top: 50%;\r\n    left: 50%;\r\n    position: fixed;\r\n    transform: translate(-50%, -50%);\r\n    box-sizing: border-box;\r\n    border-radius: 5%;\r\n    padding: 70px 30px;\n}\n.register-container h1[data-v-e59c811e]{\r\n    margin: 0;\r\n    padding: 0 0 20px;\r\n    text-align: center;\r\n    font-size: 22px;\n}\n#name[data-v-e59c811e], #email[data-v-e59c811e], #password[data-v-e59c811e], #password_confirmation[data-v-e59c811e]{\r\n    background-color: #000;\r\n    background-color: #000;\r\n    border: none;\r\n    border-bottom: 1px solid #fff;\r\n    background: transparent;\r\n    outline: none;\n}\n.nombre-label[data-v-e59c811e], .email-label[data-v-e59c811e], .pass-label[data-v-e59c811e], .confirmpass-label[data-v-e59c811e]{\r\n    margin: 0;\r\n    padding: 0;\r\n    font-weight: bold;\r\n    display: block;\r\n    color: #fff;\n}\r\n\r\n", ""]);
->>>>>>> 3177e50732f29942c7f418f4ae0452bddb9f6b78
+___CSS_LOADER_EXPORT___.push([module.id, "\n.flex[data-v-e59c811e]{\r\n    display: flex;\r\n    font-size: 30px;\n}\n.logo[data-v-e59c811e]{\r\n    width: 5%;\r\n    padding: 5px;\r\n    justify-content: center;\n}\n.cont-header[data-v-e59c811e]{\r\n    border-bottom: 1px solid #d9dadc;\r\n    padding: 25px 0 10px;\r\n    justify-content: center;\r\n    width: 100%;\n}\nheader[data-v-e59c811e]{\r\n    position:fixed;\n}\r\n\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -27407,6 +27819,30 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "\n.component[data-v-2849ffdc]{\n    background-color: rgba(18, 18, 18, 1);\n    border-top: 0.1rem solid #8F8F8F;\n}\n.progress-bar[data-v-2849ffdc]{\n    width: 30rem;\n}\n.gray-color[data-v-2849ffdc]{\n    --tw-bg-opacity: 1;\n    background-color: #8F8F8F;\n}\n.repeat-info[data-v-2849ffdc] {\n    background-color: #08a830;\n    font-size: 9px;\n    line-height: 14px;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=style&index=0&id=7bd0daa0&scoped=true&lang=css":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=style&index=0&id=7bd0daa0&scoped=true&lang=css ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.scroll[data-v-7bd0daa0]{\r\n    overflow-y: auto;\n}\n.green[data-v-7bd0daa0]{\r\n    color: #1db954;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -50244,6 +50680,770 @@ process.umask = function() { return 0; };
 
 /***/ }),
 
+/***/ "./node_modules/regenerator-runtime/runtime.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/regenerator-runtime/runtime.js ***!
+  \*****************************************************/
+/***/ ((module) => {
+
+/**
+ * Copyright (c) 2014-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+var runtime = (function (exports) {
+  "use strict";
+
+  var Op = Object.prototype;
+  var hasOwn = Op.hasOwnProperty;
+  var undefined; // More compressible than void 0.
+  var $Symbol = typeof Symbol === "function" ? Symbol : {};
+  var iteratorSymbol = $Symbol.iterator || "@@iterator";
+  var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
+  var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
+
+  function define(obj, key, value) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+    return obj[key];
+  }
+  try {
+    // IE 8 has a broken Object.defineProperty that only works on DOM objects.
+    define({}, "");
+  } catch (err) {
+    define = function(obj, key, value) {
+      return obj[key] = value;
+    };
+  }
+
+  function wrap(innerFn, outerFn, self, tryLocsList) {
+    // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
+    var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
+    var generator = Object.create(protoGenerator.prototype);
+    var context = new Context(tryLocsList || []);
+
+    // The ._invoke method unifies the implementations of the .next,
+    // .throw, and .return methods.
+    generator._invoke = makeInvokeMethod(innerFn, self, context);
+
+    return generator;
+  }
+  exports.wrap = wrap;
+
+  // Try/catch helper to minimize deoptimizations. Returns a completion
+  // record like context.tryEntries[i].completion. This interface could
+  // have been (and was previously) designed to take a closure to be
+  // invoked without arguments, but in all the cases we care about we
+  // already have an existing method we want to call, so there's no need
+  // to create a new function object. We can even get away with assuming
+  // the method takes exactly one argument, since that happens to be true
+  // in every case, so we don't have to touch the arguments object. The
+  // only additional allocation required is the completion record, which
+  // has a stable shape and so hopefully should be cheap to allocate.
+  function tryCatch(fn, obj, arg) {
+    try {
+      return { type: "normal", arg: fn.call(obj, arg) };
+    } catch (err) {
+      return { type: "throw", arg: err };
+    }
+  }
+
+  var GenStateSuspendedStart = "suspendedStart";
+  var GenStateSuspendedYield = "suspendedYield";
+  var GenStateExecuting = "executing";
+  var GenStateCompleted = "completed";
+
+  // Returning this object from the innerFn has the same effect as
+  // breaking out of the dispatch switch statement.
+  var ContinueSentinel = {};
+
+  // Dummy constructor functions that we use as the .constructor and
+  // .constructor.prototype properties for functions that return Generator
+  // objects. For full spec compliance, you may wish to configure your
+  // minifier not to mangle the names of these two functions.
+  function Generator() {}
+  function GeneratorFunction() {}
+  function GeneratorFunctionPrototype() {}
+
+  // This is a polyfill for %IteratorPrototype% for environments that
+  // don't natively support it.
+  var IteratorPrototype = {};
+  define(IteratorPrototype, iteratorSymbol, function () {
+    return this;
+  });
+
+  var getProto = Object.getPrototypeOf;
+  var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
+  if (NativeIteratorPrototype &&
+      NativeIteratorPrototype !== Op &&
+      hasOwn.call(NativeIteratorPrototype, iteratorSymbol)) {
+    // This environment has a native %IteratorPrototype%; use it instead
+    // of the polyfill.
+    IteratorPrototype = NativeIteratorPrototype;
+  }
+
+  var Gp = GeneratorFunctionPrototype.prototype =
+    Generator.prototype = Object.create(IteratorPrototype);
+  GeneratorFunction.prototype = GeneratorFunctionPrototype;
+  define(Gp, "constructor", GeneratorFunctionPrototype);
+  define(GeneratorFunctionPrototype, "constructor", GeneratorFunction);
+  GeneratorFunction.displayName = define(
+    GeneratorFunctionPrototype,
+    toStringTagSymbol,
+    "GeneratorFunction"
+  );
+
+  // Helper for defining the .next, .throw, and .return methods of the
+  // Iterator interface in terms of a single ._invoke method.
+  function defineIteratorMethods(prototype) {
+    ["next", "throw", "return"].forEach(function(method) {
+      define(prototype, method, function(arg) {
+        return this._invoke(method, arg);
+      });
+    });
+  }
+
+  exports.isGeneratorFunction = function(genFun) {
+    var ctor = typeof genFun === "function" && genFun.constructor;
+    return ctor
+      ? ctor === GeneratorFunction ||
+        // For the native GeneratorFunction constructor, the best we can
+        // do is to check its .name property.
+        (ctor.displayName || ctor.name) === "GeneratorFunction"
+      : false;
+  };
+
+  exports.mark = function(genFun) {
+    if (Object.setPrototypeOf) {
+      Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
+    } else {
+      genFun.__proto__ = GeneratorFunctionPrototype;
+      define(genFun, toStringTagSymbol, "GeneratorFunction");
+    }
+    genFun.prototype = Object.create(Gp);
+    return genFun;
+  };
+
+  // Within the body of any async function, `await x` is transformed to
+  // `yield regeneratorRuntime.awrap(x)`, so that the runtime can test
+  // `hasOwn.call(value, "__await")` to determine if the yielded value is
+  // meant to be awaited.
+  exports.awrap = function(arg) {
+    return { __await: arg };
+  };
+
+  function AsyncIterator(generator, PromiseImpl) {
+    function invoke(method, arg, resolve, reject) {
+      var record = tryCatch(generator[method], generator, arg);
+      if (record.type === "throw") {
+        reject(record.arg);
+      } else {
+        var result = record.arg;
+        var value = result.value;
+        if (value &&
+            typeof value === "object" &&
+            hasOwn.call(value, "__await")) {
+          return PromiseImpl.resolve(value.__await).then(function(value) {
+            invoke("next", value, resolve, reject);
+          }, function(err) {
+            invoke("throw", err, resolve, reject);
+          });
+        }
+
+        return PromiseImpl.resolve(value).then(function(unwrapped) {
+          // When a yielded Promise is resolved, its final value becomes
+          // the .value of the Promise<{value,done}> result for the
+          // current iteration.
+          result.value = unwrapped;
+          resolve(result);
+        }, function(error) {
+          // If a rejected Promise was yielded, throw the rejection back
+          // into the async generator function so it can be handled there.
+          return invoke("throw", error, resolve, reject);
+        });
+      }
+    }
+
+    var previousPromise;
+
+    function enqueue(method, arg) {
+      function callInvokeWithMethodAndArg() {
+        return new PromiseImpl(function(resolve, reject) {
+          invoke(method, arg, resolve, reject);
+        });
+      }
+
+      return previousPromise =
+        // If enqueue has been called before, then we want to wait until
+        // all previous Promises have been resolved before calling invoke,
+        // so that results are always delivered in the correct order. If
+        // enqueue has not been called before, then it is important to
+        // call invoke immediately, without waiting on a callback to fire,
+        // so that the async generator function has the opportunity to do
+        // any necessary setup in a predictable way. This predictability
+        // is why the Promise constructor synchronously invokes its
+        // executor callback, and why async functions synchronously
+        // execute code before the first await. Since we implement simple
+        // async functions in terms of async generators, it is especially
+        // important to get this right, even though it requires care.
+        previousPromise ? previousPromise.then(
+          callInvokeWithMethodAndArg,
+          // Avoid propagating failures to Promises returned by later
+          // invocations of the iterator.
+          callInvokeWithMethodAndArg
+        ) : callInvokeWithMethodAndArg();
+    }
+
+    // Define the unified helper method that is used to implement .next,
+    // .throw, and .return (see defineIteratorMethods).
+    this._invoke = enqueue;
+  }
+
+  defineIteratorMethods(AsyncIterator.prototype);
+  define(AsyncIterator.prototype, asyncIteratorSymbol, function () {
+    return this;
+  });
+  exports.AsyncIterator = AsyncIterator;
+
+  // Note that simple async functions are implemented on top of
+  // AsyncIterator objects; they just return a Promise for the value of
+  // the final result produced by the iterator.
+  exports.async = function(innerFn, outerFn, self, tryLocsList, PromiseImpl) {
+    if (PromiseImpl === void 0) PromiseImpl = Promise;
+
+    var iter = new AsyncIterator(
+      wrap(innerFn, outerFn, self, tryLocsList),
+      PromiseImpl
+    );
+
+    return exports.isGeneratorFunction(outerFn)
+      ? iter // If outerFn is a generator, return the full iterator.
+      : iter.next().then(function(result) {
+          return result.done ? result.value : iter.next();
+        });
+  };
+
+  function makeInvokeMethod(innerFn, self, context) {
+    var state = GenStateSuspendedStart;
+
+    return function invoke(method, arg) {
+      if (state === GenStateExecuting) {
+        throw new Error("Generator is already running");
+      }
+
+      if (state === GenStateCompleted) {
+        if (method === "throw") {
+          throw arg;
+        }
+
+        // Be forgiving, per 25.3.3.3.3 of the spec:
+        // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-generatorresume
+        return doneResult();
+      }
+
+      context.method = method;
+      context.arg = arg;
+
+      while (true) {
+        var delegate = context.delegate;
+        if (delegate) {
+          var delegateResult = maybeInvokeDelegate(delegate, context);
+          if (delegateResult) {
+            if (delegateResult === ContinueSentinel) continue;
+            return delegateResult;
+          }
+        }
+
+        if (context.method === "next") {
+          // Setting context._sent for legacy support of Babel's
+          // function.sent implementation.
+          context.sent = context._sent = context.arg;
+
+        } else if (context.method === "throw") {
+          if (state === GenStateSuspendedStart) {
+            state = GenStateCompleted;
+            throw context.arg;
+          }
+
+          context.dispatchException(context.arg);
+
+        } else if (context.method === "return") {
+          context.abrupt("return", context.arg);
+        }
+
+        state = GenStateExecuting;
+
+        var record = tryCatch(innerFn, self, context);
+        if (record.type === "normal") {
+          // If an exception is thrown from innerFn, we leave state ===
+          // GenStateExecuting and loop back for another invocation.
+          state = context.done
+            ? GenStateCompleted
+            : GenStateSuspendedYield;
+
+          if (record.arg === ContinueSentinel) {
+            continue;
+          }
+
+          return {
+            value: record.arg,
+            done: context.done
+          };
+
+        } else if (record.type === "throw") {
+          state = GenStateCompleted;
+          // Dispatch the exception by looping back around to the
+          // context.dispatchException(context.arg) call above.
+          context.method = "throw";
+          context.arg = record.arg;
+        }
+      }
+    };
+  }
+
+  // Call delegate.iterator[context.method](context.arg) and handle the
+  // result, either by returning a { value, done } result from the
+  // delegate iterator, or by modifying context.method and context.arg,
+  // setting context.delegate to null, and returning the ContinueSentinel.
+  function maybeInvokeDelegate(delegate, context) {
+    var method = delegate.iterator[context.method];
+    if (method === undefined) {
+      // A .throw or .return when the delegate iterator has no .throw
+      // method always terminates the yield* loop.
+      context.delegate = null;
+
+      if (context.method === "throw") {
+        // Note: ["return"] must be used for ES3 parsing compatibility.
+        if (delegate.iterator["return"]) {
+          // If the delegate iterator has a return method, give it a
+          // chance to clean up.
+          context.method = "return";
+          context.arg = undefined;
+          maybeInvokeDelegate(delegate, context);
+
+          if (context.method === "throw") {
+            // If maybeInvokeDelegate(context) changed context.method from
+            // "return" to "throw", let that override the TypeError below.
+            return ContinueSentinel;
+          }
+        }
+
+        context.method = "throw";
+        context.arg = new TypeError(
+          "The iterator does not provide a 'throw' method");
+      }
+
+      return ContinueSentinel;
+    }
+
+    var record = tryCatch(method, delegate.iterator, context.arg);
+
+    if (record.type === "throw") {
+      context.method = "throw";
+      context.arg = record.arg;
+      context.delegate = null;
+      return ContinueSentinel;
+    }
+
+    var info = record.arg;
+
+    if (! info) {
+      context.method = "throw";
+      context.arg = new TypeError("iterator result is not an object");
+      context.delegate = null;
+      return ContinueSentinel;
+    }
+
+    if (info.done) {
+      // Assign the result of the finished delegate to the temporary
+      // variable specified by delegate.resultName (see delegateYield).
+      context[delegate.resultName] = info.value;
+
+      // Resume execution at the desired location (see delegateYield).
+      context.next = delegate.nextLoc;
+
+      // If context.method was "throw" but the delegate handled the
+      // exception, let the outer generator proceed normally. If
+      // context.method was "next", forget context.arg since it has been
+      // "consumed" by the delegate iterator. If context.method was
+      // "return", allow the original .return call to continue in the
+      // outer generator.
+      if (context.method !== "return") {
+        context.method = "next";
+        context.arg = undefined;
+      }
+
+    } else {
+      // Re-yield the result returned by the delegate method.
+      return info;
+    }
+
+    // The delegate iterator is finished, so forget it and continue with
+    // the outer generator.
+    context.delegate = null;
+    return ContinueSentinel;
+  }
+
+  // Define Generator.prototype.{next,throw,return} in terms of the
+  // unified ._invoke helper method.
+  defineIteratorMethods(Gp);
+
+  define(Gp, toStringTagSymbol, "Generator");
+
+  // A Generator should always return itself as the iterator object when the
+  // @@iterator function is called on it. Some browsers' implementations of the
+  // iterator prototype chain incorrectly implement this, causing the Generator
+  // object to not be returned from this call. This ensures that doesn't happen.
+  // See https://github.com/facebook/regenerator/issues/274 for more details.
+  define(Gp, iteratorSymbol, function() {
+    return this;
+  });
+
+  define(Gp, "toString", function() {
+    return "[object Generator]";
+  });
+
+  function pushTryEntry(locs) {
+    var entry = { tryLoc: locs[0] };
+
+    if (1 in locs) {
+      entry.catchLoc = locs[1];
+    }
+
+    if (2 in locs) {
+      entry.finallyLoc = locs[2];
+      entry.afterLoc = locs[3];
+    }
+
+    this.tryEntries.push(entry);
+  }
+
+  function resetTryEntry(entry) {
+    var record = entry.completion || {};
+    record.type = "normal";
+    delete record.arg;
+    entry.completion = record;
+  }
+
+  function Context(tryLocsList) {
+    // The root entry object (effectively a try statement without a catch
+    // or a finally block) gives us a place to store values thrown from
+    // locations where there is no enclosing try statement.
+    this.tryEntries = [{ tryLoc: "root" }];
+    tryLocsList.forEach(pushTryEntry, this);
+    this.reset(true);
+  }
+
+  exports.keys = function(object) {
+    var keys = [];
+    for (var key in object) {
+      keys.push(key);
+    }
+    keys.reverse();
+
+    // Rather than returning an object with a next method, we keep
+    // things simple and return the next function itself.
+    return function next() {
+      while (keys.length) {
+        var key = keys.pop();
+        if (key in object) {
+          next.value = key;
+          next.done = false;
+          return next;
+        }
+      }
+
+      // To avoid creating an additional object, we just hang the .value
+      // and .done properties off the next function object itself. This
+      // also ensures that the minifier will not anonymize the function.
+      next.done = true;
+      return next;
+    };
+  };
+
+  function values(iterable) {
+    if (iterable) {
+      var iteratorMethod = iterable[iteratorSymbol];
+      if (iteratorMethod) {
+        return iteratorMethod.call(iterable);
+      }
+
+      if (typeof iterable.next === "function") {
+        return iterable;
+      }
+
+      if (!isNaN(iterable.length)) {
+        var i = -1, next = function next() {
+          while (++i < iterable.length) {
+            if (hasOwn.call(iterable, i)) {
+              next.value = iterable[i];
+              next.done = false;
+              return next;
+            }
+          }
+
+          next.value = undefined;
+          next.done = true;
+
+          return next;
+        };
+
+        return next.next = next;
+      }
+    }
+
+    // Return an iterator with no values.
+    return { next: doneResult };
+  }
+  exports.values = values;
+
+  function doneResult() {
+    return { value: undefined, done: true };
+  }
+
+  Context.prototype = {
+    constructor: Context,
+
+    reset: function(skipTempReset) {
+      this.prev = 0;
+      this.next = 0;
+      // Resetting context._sent for legacy support of Babel's
+      // function.sent implementation.
+      this.sent = this._sent = undefined;
+      this.done = false;
+      this.delegate = null;
+
+      this.method = "next";
+      this.arg = undefined;
+
+      this.tryEntries.forEach(resetTryEntry);
+
+      if (!skipTempReset) {
+        for (var name in this) {
+          // Not sure about the optimal order of these conditions:
+          if (name.charAt(0) === "t" &&
+              hasOwn.call(this, name) &&
+              !isNaN(+name.slice(1))) {
+            this[name] = undefined;
+          }
+        }
+      }
+    },
+
+    stop: function() {
+      this.done = true;
+
+      var rootEntry = this.tryEntries[0];
+      var rootRecord = rootEntry.completion;
+      if (rootRecord.type === "throw") {
+        throw rootRecord.arg;
+      }
+
+      return this.rval;
+    },
+
+    dispatchException: function(exception) {
+      if (this.done) {
+        throw exception;
+      }
+
+      var context = this;
+      function handle(loc, caught) {
+        record.type = "throw";
+        record.arg = exception;
+        context.next = loc;
+
+        if (caught) {
+          // If the dispatched exception was caught by a catch block,
+          // then let that catch block handle the exception normally.
+          context.method = "next";
+          context.arg = undefined;
+        }
+
+        return !! caught;
+      }
+
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        var record = entry.completion;
+
+        if (entry.tryLoc === "root") {
+          // Exception thrown outside of any try block that could handle
+          // it, so set the completion value of the entire function to
+          // throw the exception.
+          return handle("end");
+        }
+
+        if (entry.tryLoc <= this.prev) {
+          var hasCatch = hasOwn.call(entry, "catchLoc");
+          var hasFinally = hasOwn.call(entry, "finallyLoc");
+
+          if (hasCatch && hasFinally) {
+            if (this.prev < entry.catchLoc) {
+              return handle(entry.catchLoc, true);
+            } else if (this.prev < entry.finallyLoc) {
+              return handle(entry.finallyLoc);
+            }
+
+          } else if (hasCatch) {
+            if (this.prev < entry.catchLoc) {
+              return handle(entry.catchLoc, true);
+            }
+
+          } else if (hasFinally) {
+            if (this.prev < entry.finallyLoc) {
+              return handle(entry.finallyLoc);
+            }
+
+          } else {
+            throw new Error("try statement without catch or finally");
+          }
+        }
+      }
+    },
+
+    abrupt: function(type, arg) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc <= this.prev &&
+            hasOwn.call(entry, "finallyLoc") &&
+            this.prev < entry.finallyLoc) {
+          var finallyEntry = entry;
+          break;
+        }
+      }
+
+      if (finallyEntry &&
+          (type === "break" ||
+           type === "continue") &&
+          finallyEntry.tryLoc <= arg &&
+          arg <= finallyEntry.finallyLoc) {
+        // Ignore the finally entry if control is not jumping to a
+        // location outside the try/catch block.
+        finallyEntry = null;
+      }
+
+      var record = finallyEntry ? finallyEntry.completion : {};
+      record.type = type;
+      record.arg = arg;
+
+      if (finallyEntry) {
+        this.method = "next";
+        this.next = finallyEntry.finallyLoc;
+        return ContinueSentinel;
+      }
+
+      return this.complete(record);
+    },
+
+    complete: function(record, afterLoc) {
+      if (record.type === "throw") {
+        throw record.arg;
+      }
+
+      if (record.type === "break" ||
+          record.type === "continue") {
+        this.next = record.arg;
+      } else if (record.type === "return") {
+        this.rval = this.arg = record.arg;
+        this.method = "return";
+        this.next = "end";
+      } else if (record.type === "normal" && afterLoc) {
+        this.next = afterLoc;
+      }
+
+      return ContinueSentinel;
+    },
+
+    finish: function(finallyLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.finallyLoc === finallyLoc) {
+          this.complete(entry.completion, entry.afterLoc);
+          resetTryEntry(entry);
+          return ContinueSentinel;
+        }
+      }
+    },
+
+    "catch": function(tryLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc === tryLoc) {
+          var record = entry.completion;
+          if (record.type === "throw") {
+            var thrown = record.arg;
+            resetTryEntry(entry);
+          }
+          return thrown;
+        }
+      }
+
+      // The context.catch method must only be called with a location
+      // argument that corresponds to a known catch block.
+      throw new Error("illegal catch attempt");
+    },
+
+    delegateYield: function(iterable, resultName, nextLoc) {
+      this.delegate = {
+        iterator: values(iterable),
+        resultName: resultName,
+        nextLoc: nextLoc
+      };
+
+      if (this.method === "next") {
+        // Deliberately forget the last sent value so that we don't
+        // accidentally pass it on to the delegate.
+        this.arg = undefined;
+      }
+
+      return ContinueSentinel;
+    }
+  };
+
+  // Regardless of whether this script is executing as a CommonJS module
+  // or not, return the runtime object so that we can declare the variable
+  // regeneratorRuntime in the outer scope, which allows this module to be
+  // injected easily by `bin/regenerator --include-runtime script.js`.
+  return exports;
+
+}(
+  // If this script is executing as a CommonJS module, use module.exports
+  // as the regeneratorRuntime namespace. Otherwise create a new empty
+  // object. Either way, the resulting object will be used to initialize
+  // the regeneratorRuntime variable at the top of this file.
+   true ? module.exports : 0
+));
+
+try {
+  regeneratorRuntime = runtime;
+} catch (accidentalStrictMode) {
+  // This module should not be running in strict mode, so the above
+  // assignment should always work unless something is misconfigured. Just
+  // in case runtime.js accidentally runs in strict mode, in modern engines
+  // we can explicitly access globalThis. In older engines we can escape
+  // strict mode using a global Function call. This could conceivably fail
+  // if a Content Security Policy forbids using Function, but in that case
+  // the proper solution is to fix the accidental strict mode problem. If
+  // you've misconfigured your bundler to force strict mode and applied a
+  // CSP to forbid Function, and you're not willing to fix either of those
+  // problems, please detail your unique predicament in a GitHub issue.
+  if (typeof globalThis === "object") {
+    globalThis.regeneratorRuntime = runtime;
+  } else {
+    Function("r", "regeneratorRuntime = r")(runtime);
+  }
+}
+
+
+/***/ }),
+
 /***/ "./node_modules/side-channel/index.js":
 /*!********************************************!*\
   !*** ./node_modules/side-channel/index.js ***!
@@ -50496,6 +51696,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_MusicPlayer_vue_vue_type_style_index_0_id_2849ffdc_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__.default.locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=style&index=0&id=7bd0daa0&scoped=true&lang=css":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=style&index=0&id=7bd0daa0&scoped=true&lang=css ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PlaylistDetail_vue_vue_type_style_index_0_id_7bd0daa0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PlaylistDetail.vue?vue&type=style&index=0&id=7bd0daa0&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=style&index=0&id=7bd0daa0&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PlaylistDetail_vue_vue_type_style_index_0_id_7bd0daa0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__.default, options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PlaylistDetail_vue_vue_type_style_index_0_id_7bd0daa0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__.default.locals || {});
 
 /***/ }),
 
@@ -51918,6 +53148,62 @@ _MusicPlayer_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.default.__
 
 /***/ }),
 
+/***/ "./resources/js/Pages/Components/playlist/PlaylistDetail.vue":
+/*!*******************************************************************!*\
+  !*** ./resources/js/Pages/Components/playlist/PlaylistDetail.vue ***!
+  \*******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _PlaylistDetail_vue_vue_type_template_id_7bd0daa0_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PlaylistDetail.vue?vue&type=template&id=7bd0daa0&scoped=true */ "./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=template&id=7bd0daa0&scoped=true");
+/* harmony import */ var _PlaylistDetail_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./PlaylistDetail.vue?vue&type=script&lang=js */ "./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=script&lang=js");
+/* harmony import */ var _PlaylistDetail_vue_vue_type_style_index_0_id_7bd0daa0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./PlaylistDetail.vue?vue&type=style&index=0&id=7bd0daa0&scoped=true&lang=css */ "./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=style&index=0&id=7bd0daa0&scoped=true&lang=css");
+
+
+
+
+;
+_PlaylistDetail_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.default.render = _PlaylistDetail_vue_vue_type_template_id_7bd0daa0_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render
+_PlaylistDetail_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.default.__scopeId = "data-v-7bd0daa0"
+/* hot reload */
+if (false) {}
+
+_PlaylistDetail_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.default.__file = "resources/js/Pages/Components/playlist/PlaylistDetail.vue"
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_PlaylistDetail_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.default);
+
+/***/ }),
+
+/***/ "./resources/js/Pages/Components/playlist/Playlists.vue":
+/*!**************************************************************!*\
+  !*** ./resources/js/Pages/Components/playlist/Playlists.vue ***!
+  \**************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _Playlists_vue_vue_type_template_id_4fbe8904__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Playlists.vue?vue&type=template&id=4fbe8904 */ "./resources/js/Pages/Components/playlist/Playlists.vue?vue&type=template&id=4fbe8904");
+/* harmony import */ var _Playlists_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Playlists.vue?vue&type=script&lang=js */ "./resources/js/Pages/Components/playlist/Playlists.vue?vue&type=script&lang=js");
+
+
+
+_Playlists_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.default.render = _Playlists_vue_vue_type_template_id_4fbe8904__WEBPACK_IMPORTED_MODULE_0__.render
+/* hot reload */
+if (false) {}
+
+_Playlists_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.default.__file = "resources/js/Pages/Components/playlist/Playlists.vue"
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_Playlists_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__.default);
+
+/***/ }),
+
 /***/ "./resources/js/Pages/Components/sidebar/Navigation.vue":
 /*!**************************************************************!*\
   !*** ./resources/js/Pages/Components/sidebar/Navigation.vue ***!
@@ -52816,6 +54102,38 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=script&lang=js":
+/*!*******************************************************************************************!*\
+  !*** ./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=script&lang=js ***!
+  \*******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PlaylistDetail_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.default)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PlaylistDetail_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PlaylistDetail.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
+/***/ "./resources/js/Pages/Components/playlist/Playlists.vue?vue&type=script&lang=js":
+/*!**************************************************************************************!*\
+  !*** ./resources/js/Pages/Components/playlist/Playlists.vue?vue&type=script&lang=js ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Playlists_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__.default)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Playlists_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./Playlists.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/Playlists.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
 /***/ "./resources/js/Pages/Components/sidebar/Navigation.vue?vue&type=script&lang=js":
 /*!**************************************************************************************!*\
   !*** ./resources/js/Pages/Components/sidebar/Navigation.vue?vue&type=script&lang=js ***!
@@ -53648,6 +54966,38 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=template&id=7bd0daa0&scoped=true":
+/*!*************************************************************************************************************!*\
+  !*** ./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=template&id=7bd0daa0&scoped=true ***!
+  \*************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PlaylistDetail_vue_vue_type_template_id_7bd0daa0_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PlaylistDetail_vue_vue_type_template_id_7bd0daa0_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PlaylistDetail.vue?vue&type=template&id=7bd0daa0&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=template&id=7bd0daa0&scoped=true");
+
+
+/***/ }),
+
+/***/ "./resources/js/Pages/Components/playlist/Playlists.vue?vue&type=template&id=4fbe8904":
+/*!********************************************************************************************!*\
+  !*** ./resources/js/Pages/Components/playlist/Playlists.vue?vue&type=template&id=4fbe8904 ***!
+  \********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "render": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Playlists_vue_vue_type_template_id_4fbe8904__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Playlists_vue_vue_type_template_id_4fbe8904__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./Playlists.vue?vue&type=template&id=4fbe8904 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/Playlists.vue?vue&type=template&id=4fbe8904");
+
+
+/***/ }),
+
 /***/ "./resources/js/Pages/Components/sidebar/Navigation.vue?vue&type=template&id=0bcd8987&scoped=true":
 /*!********************************************************************************************************!*\
   !*** ./resources/js/Pages/Components/sidebar/Navigation.vue?vue&type=template&id=0bcd8987&scoped=true ***!
@@ -53904,6 +55254,19 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_MusicPlayer_vue_vue_type_style_index_0_id_2849ffdc_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/style-loader/dist/cjs.js!../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./MusicPlayer.vue?vue&type=style&index=0&id=2849ffdc&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/footer/MusicPlayer.vue?vue&type=style&index=0&id=2849ffdc&scoped=true&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=style&index=0&id=7bd0daa0&scoped=true&lang=css":
+/*!***************************************************************************************************************************!*\
+  !*** ./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=style&index=0&id=7bd0daa0&scoped=true&lang=css ***!
+  \***************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PlaylistDetail_vue_vue_type_style_index_0_id_7bd0daa0_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/style-loader/dist/cjs.js!../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PlaylistDetail.vue?vue&type=style&index=0&id=7bd0daa0&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/Pages/Components/playlist/PlaylistDetail.vue?vue&type=style&index=0&id=7bd0daa0&scoped=true&lang=css");
 
 
 /***/ }),
@@ -54210,6 +55573,8 @@ var map = {
 	"./Auth/VerifyEmail.vue": "./resources/js/Pages/Auth/VerifyEmail.vue",
 	"./Components/content/Content.vue": "./resources/js/Pages/Components/content/Content.vue",
 	"./Components/footer/MusicPlayer.vue": "./resources/js/Pages/Components/footer/MusicPlayer.vue",
+	"./Components/playlist/PlaylistDetail.vue": "./resources/js/Pages/Components/playlist/PlaylistDetail.vue",
+	"./Components/playlist/Playlists.vue": "./resources/js/Pages/Components/playlist/Playlists.vue",
 	"./Components/sidebar/Navigation.vue": "./resources/js/Pages/Components/sidebar/Navigation.vue",
 	"./Components/sidebar/Playlists.vue": "./resources/js/Pages/Components/sidebar/Playlists.vue",
 	"./Components/sidebar/SideBar.vue": "./resources/js/Pages/Components/sidebar/SideBar.vue",
