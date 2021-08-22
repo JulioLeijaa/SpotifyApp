@@ -1,10 +1,19 @@
 <template>
     <div class="scroll flex flex-col bg-black">
+        <div class="header h-20 w-full flex flex-row-reverse items-center">
+            <div class="logout h-1" @click.prevent="logout">
+                <p>Cerrar sesión</p>
+            </div>
+            <!-- <div class="line"></div>
+            <h1 class="m-4 font-bold text-header">Premium</h1>
+            <h1 class="m-4 font-bold text-header">Ayuda</h1>
+            <h1 class="m-4 font-bold text-header">Descargar</h1> -->
+        </div>
         <div class="p-10 flex flex-row">
             <div>
                 <img :src="playlists.url_image" alt="" srcset="" class="h-48 w-48">
             </div>
-            <div class="ml-8 flex flex-col h-48 ">
+            <div class="ml-6 flex flex-col h-48 justify-end">
                 <p class="text-white text-blond text-base">PLAYLIST</p>
                 <p class="text-white text-blond text-5xl">{{playlists.name}}</p>
             </div>   
@@ -16,7 +25,7 @@
                     <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM6.79 5.093A.5.5 0 0 0 6 5.5v5a.5.5 0 0 0 .79.407l3.5-2.5a.5.5 0 0 0 0-.814l-3.5-2.5z"/>
                     </svg>
                 </div>
-                <div class="mx-10">
+                <div class="mx-10" v-if="playlists.id !== 3">
                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" class="bi bi-heart-fill fill-current green" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
                     </svg>
@@ -94,7 +103,12 @@ export default {
     name:'PlaylistDetail',
     props: {
         playlists: Object
-    }
+    },
+    methods: {
+            logout() {
+                this.$inertia.post(route('logout'));
+            }
+        }
 }
 </script>
 
@@ -104,5 +118,26 @@ export default {
 }
 .green{
     color: #1db954;
+}
+.logout {
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 0;
+    border-radius: 23px;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    gap: 8px;
+    height: 32px;
+    justify-content: center;
+    margin-inline-start: 16px;
+    min-width: 32px;
+    padding: 2px 10px;
+    position: relative;
+    margin: 16px;
+}
+
+.logout:hover {
+    background-color: #282828;
 }
 </style>
