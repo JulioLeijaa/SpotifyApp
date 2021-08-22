@@ -38,12 +38,12 @@
             <div class="block mt-4">
                 <label class="flex items-center">
                     <jet-checkbox name="remember" v-model:checked="form.remember" />
-                    <span class="ml-2 text-sm text-gray-600 text-white">Recordarme</span>
+                    <span class="ml-2 text-sm text-white">Recordarme</span>
                 </label>
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <Link :href="route('register')" class="underline text-sm text-gray-600 hover:text-gray-900 text-white">
+                <Link :href="route('register')" class="underline text-sm hover:text-gray-900 text-white">
                     ¿No tienes cuenta?
                 </Link>
 
