@@ -13,6 +13,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        // RUN NEXT COMMAND -> php artisan db:seed
+        $this->call(PlaylistsSeeder::class);
+        $this->call(SongsSeeder::class);
+        $this->call(PlaylistSongSeeder::class);
     }
 }
