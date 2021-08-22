@@ -1,9 +1,9 @@
 <template>
     <div class="component flex items-center justify-between px-5">
-        <div class="flex max-w-xs">
+        <div class="flex flex-none" style="width: 20rem;">
             <img :src="currentSong.img"  alt="Img Song" width="70" height="70">
 
-            <div class="flex items-center ml-4">
+            <div class="flex items-center ml-4" style="width: 13rem;">
                 <div>
                     <p class="text-base font-semibold text-gray-100">{{currentSong.title}}</p>
                     <p class="text-xs font-normal text-white">{{currentSong.artist}}</p>
@@ -18,7 +18,7 @@
             </div>
         </div>
 
-        <div class="flex flex-col mr-12">
+        <div class="flex static flex-col mr-12">
             <!-- Inicio Botones -->
             <div class="flex items-center justify-center">
                 <div class="mr-6">
@@ -39,7 +39,7 @@
                     <img src="/assets/SkipForward.png" alt="Skip Forward button" width="20" height="20" @click="skip('forward')">
                 </div>
 
-                <div class="flex ml-6">
+                <div class="flex ml-6" style="width: 2rem;">
                     <img src="/assets/Repeat.png" alt="Shuffle button" width="20" height="20" v-if="!onRepeat" @click="repeat">
                     <img src="/assets/RepeatActivado.png" alt="Shuffle button" width="20" height="20" v-else @click="repeat">
                     <div class="repeat-info h-3.5 w-3.5 rounded-full text-center text-white capitalize tracking-wide" v-if="onRepeat">{{loop.value}}</div>
@@ -53,7 +53,7 @@
                     <!-- 00:00 -->
                 </div>
 
-                <div class="overflow-hidden h-1 flex rounded progress-bar gray-color">
+                <div class="overflow-hidden h-1 flex rounded gray-color" style="width: 30rem;">
                     <!-- w-96 -->
                     <div :style="{width: progressPercentageValue + '%'}" class="bg-white"></div>
                     <!-- progressPercentageValue -->
@@ -500,10 +500,6 @@ export default {
 .component{
     background-color: rgba(18, 18, 18, 1);
     border-top: 0.1rem solid #8F8F8F;
-}
-
-.progress-bar{
-    width: 30rem;
 }
 
 .gray-color{
