@@ -47,6 +47,14 @@ class PlaylistsSeeder extends Seeder
                 'active' => true,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
+            ],
+            [
+                'id' => 5,
+                'name' => 'Tranqui',
+                'url_image' => '/music/Rockstar.jpg',
+                'active' => true,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]
         ];
 
