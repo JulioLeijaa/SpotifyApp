@@ -2,7 +2,7 @@
     <div class="h-screen flex flex-col">
         <div class="h-5/6 flex flex-row">
             <side-bar class="w-1/5" />
-            <content class="w-4/5" />
+            <content :playlists="playlists" class="w-4/5" />
         </div>
         <div class="h-1/6 ">
             <music-player class="w-full h-full" />
@@ -41,22 +41,8 @@
             Content,
             MusicPlayer,
         },
-        // data() {
-        //     return {
-        //         songs: [
-        //                 {
-        //                     id: 0,
-        //                     title: "Wow",
-        //                     artist: "Post Malone",
-        //                     album: "",
-        //                     url:
-        //                     "https://res.cloudinary.com/dmf10fesn/video/upload/v1548882863/audio/Post_Malone_-_Wow._playvk.com.mp3",
-        //                     img:
-        //                     "https://res.cloudinary.com/dmf10fesn/image/upload/v1548884701/audio/album%20arts/s-l300.jpg"
-        //                 }
-        //             ],
-        //         },
-        //     }
-        // }
+        props:{
+            playlists: Object
+        }
     }
 </script>

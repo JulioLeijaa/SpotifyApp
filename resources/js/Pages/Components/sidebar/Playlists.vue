@@ -2,7 +2,7 @@
     <div class="content h-48">
         <ul>
             <li v-for="playlist of playlists" :key="playlist.id" class="text-white text-opacity-75 m-2 text-sm">
-                {{playlist.name}}
+                <a :href="'/playlist/' + playlist.id">{{playlist.name}}</a> 
             </li>
         </ul>
     </div>

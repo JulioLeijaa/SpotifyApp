@@ -1,49 +1,25 @@
 <template>
     <div class="content flex flex-col">
         <div class="header h-20 w-full flex flex-row-reverse items-center">
-            <div class="logout h-1">
+            <div class="logout h-1" @click.prevent="logout">
                 <p>Cerrar sesión</p>
             </div>
-            <div class="line"></div>
+            <!-- <div class="line"></div>
             <h1 class="m-4 font-bold text-header">Premium</h1>
             <h1 class="m-4 font-bold text-header">Ayuda</h1>
-            <h1 class="m-4 font-bold text-header">Descargar</h1>
+            <h1 class="m-4 font-bold text-header">Descargar</h1> -->
         </div>
         <div class="info flex flex-col">
             <div class="info-title m-4">
                 <h1 class="font-extrabold text-4xl">Buenas noches</h1>
             </div>
             <div class="info-songs m-4">
-                <div class="info-wrap-song">
+                <div class="info-wrap-song" v-for="playlist of playlists" :key="playlist.id">
                     <div class="info-wrap-img">
-                        <img src="" alt="image" srcset="" />
+                        <img :src="playlist.url_image" alt="image" srcset="" />
                     </div>
                     <div class="info-song-text p-4 flex items-center">
-                        <h1 class="font-semibold color-white">Name song</h1>
-                    </div>
-                </div>
-                <div class="info-wrap-song">
-                    <div class="info-wrap-img">
-                        <img src="" alt="image" srcset="" />
-                    </div>
-                    <div class="info-song-text p-4 flex items-center">
-                        <h1 class="font-semibold color-white">Name song</h1>
-                    </div>
-                </div>
-                <div class="info-wrap-song">
-                    <div class="info-wrap-img">
-                        <img src="" alt="image" srcset="" />
-                    </div>
-                    <div class="info-song-text p-4 flex items-center">
-                        <h1 class="font-semibold color-white">Name song</h1>
-                    </div>
-                </div>
-                <div class="info-wrap-song">
-                    <div class="info-wrap-img">
-                        <img src="" alt="image" srcset="" />
-                    </div>
-                    <div class="info-song-text p-4 flex items-center">
-                        <h1 class="font-semibold color-white">Name song</h1>
+                        <h1 class="font-semibold color-white">{{playlist.name}}</h1>
                     </div>
                 </div>
             </div>
@@ -72,6 +48,14 @@
 <script>
 export default {
     name: "Content",
+    props: {
+        playlists: Object
+    },
+    methods: {
+            logout() {
+                this.$inertia.post(route('logout'));
+            }
+        }
 };
 </script>
 
