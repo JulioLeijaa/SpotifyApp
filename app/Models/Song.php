@@ -9,6 +9,10 @@ class Song extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'created_at' => 'date:j F Y'
+    ];
+
     public function playlists()
     {
         return $this->belongsToMany(Playlist::class, 'playlist_song', 'playlist_id', 'song_id');
