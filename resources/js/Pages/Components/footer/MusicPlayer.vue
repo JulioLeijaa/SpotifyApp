@@ -205,6 +205,7 @@ export default {
             }
         },
         skip(direction) {
+            if (this.playlist.songs.length <= 1){ return; }
             if (direction === "forward") {
                 this.playlist.currentIndex += 1;
             } else if (direction === "backward") {
