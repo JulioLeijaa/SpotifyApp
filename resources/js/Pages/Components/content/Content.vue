@@ -14,14 +14,14 @@
                 <h1 class="font-extrabold text-4xl">Buenas noches</h1>
             </div>
             <div class="info-songs m-4">
-                <div class="info-wrap-song" v-for="playlist of playlists" :key="playlist.id">
+                <a class="info-wrap-song" v-for="playlist of playlists" :key="playlist.id" :href="'/playlist/'+playlist.id" >
                     <div class="info-wrap-img">
                         <img :src="playlist.url_image" alt="image" srcset="" />
                     </div>
                     <div class="info-song-text p-4 flex items-center">
                         <h1 class="font-semibold color-white">{{playlist.name}}</h1>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
         <div class="songs flex flex-col">

@@ -82,6 +82,9 @@
 <script>
 export default {
     name:'MusicPlayer',
+    props:{
+        songs: Array
+    },
     data() {
         return {
             isLiked: false,
@@ -104,15 +107,6 @@ export default {
             autoPlay: false,
             progressPercentageValue: 0,
 
-            // currentSong: {
-            //     id: "",
-            //     title: "Another one bites the dust",
-            //     artist: "Queen",
-            //     album: "The Game",
-            //     song: "music/AnotherOneBitesTheDust.mp3",
-            //     img: "music/AnotherOneBitesTheDust.jpg"
-            // },
-
             currentSong: {
                 id: "",
                 title: "",
@@ -131,24 +125,8 @@ export default {
                         title: "Desvelado",
                         artist: "Bobby Pulido",
                         album: "Desvelado",
-                        song: "/music/Desvelado.mp3",
-                        img: "/music/Desvelado.jpg"
-                    },
-                    {
-                        id: 2,
-                        title: "Another one bites the dust",
-                        artist: "Queen",
-                        album: "The Game",
-                        song: "/music/AnotherOneBitesTheDust.mp3",
-                        img: "/music/AnotherOneBitesTheDust.jpg"
-                    },
-                    {
-                        id: 3,
-                        title: "PamPam",
-                        artist: "Wisin & Yandel",
-                        album: "Pa'l mundo",
-                        song: "/music/PamPam.mp3",
-                        img: "/music/PamPam.jpg"
+                        url_song: "/music/Desvelado.mp3",
+                        url_image: "/music/Desvelado.jpg"
                     }
                 ]
             },
@@ -293,7 +271,7 @@ export default {
             }
         },
         initPlayer() {
-            this.audioPlayer.src = this.playlist.songs[0].song;
+            this.audioPlayer.src = this.playlist.songs[0].url_song;
             this.setCurrentSong(this.playlist.songs[0]);
 
             this.audioPlayer.addEventListener("timeupdate", this.updateTimer);
@@ -322,7 +300,7 @@ export default {
                         console.log("playMethod", "song already in playlist");
                         }
 
-                        this.setAudio(song.url);
+                        this.setAudio(song.url_song);
                         this.setCurrentSong(song);
                         this.playlist.currentIndex = this.getObjectIndexFromArray(
                         song,
@@ -361,8 +339,8 @@ export default {
             this.currentSong.title = song.title;
             this.currentSong.artist = song.artist;
             this.currentSong.album = song.album;
-            this.currentSong.song = song.song;
-            this.currentSong.img = song.img;
+            this.currentSong.song = song.url_song;
+            this.currentSong.img = song.url_image;
 
             this.previousPlaylistIndex = this.playlist.currentIndex;
             console.log(this.currentSong);
@@ -491,6 +469,12 @@ export default {
                 array[index] = temp;
             }
             return array;
+        }
+    },
+    watch:{
+        songs: function(newVal, oldVal){
+            // console.log('Prop changed: ', newVal, ' | was: ', oldVal)
+            this.playlist.songs = newVal
         }
     }
 }

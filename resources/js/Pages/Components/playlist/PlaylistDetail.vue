@@ -57,7 +57,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-black divide-y divide-gray-800">
-                                    <tr v-for="song of playlists.songs" :key="song.id">
+                                    <tr v-for="song of playlists.songs" :key="song.id" @click="sendfather(playlists.songs)">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-white text-opacity-75">
                                             {{song.id}}
                                         </td>
@@ -107,6 +107,10 @@ export default {
     methods: {
             logout() {
                 this.$inertia.post(route('logout'));
+            },
+            sendfather(data) {
+                // let datos = await axios.get(...);
+                this.$emit('songs', data);
             }
         }
 }
