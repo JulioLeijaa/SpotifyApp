@@ -1,7 +1,7 @@
 <template>
     <div>
         <div >
-            <img src="assets/spotify.png" width="175" height="40" alt="" srcset="">
+            <img src="/assets/spotify.png" width="175" height="40" alt="" srcset="">
         </div>
         <!-- <div class="flex flex-row place-items-center my-2"> -->
             <a :href="'/dashboard'" class="flex flex-row place-items-center my-2">

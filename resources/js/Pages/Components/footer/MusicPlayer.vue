@@ -1,7 +1,7 @@
 <template>
     <div class="component flex items-center justify-between px-5">
         <div class="flex max-w-xs">
-            <img src="music/AnotherOneBitesTheDust.jpg" alt="Img Song" width="70" height="70">
+            <img src="/music/AnotherOneBitesTheDust.jpg" alt="Img Song" width="70" height="70">
 
             <div class="flex items-center ml-4">
                 <div>
@@ -14,8 +14,8 @@
 
             <div class="flex items-center ml-4">
                 <div>
-                    <img src="assets/Corazon.png" alt="Img Song" width="20" height="20" v-if="!isLiked" @click="likeSong">
-                    <img src="assets/CorazonColoreado.png" alt="Img Song" width="20" height="20" v-else @click="likeSong">
+                    <img src="/assets/Corazon.png" alt="Img Song" width="20" height="20" v-if="!isLiked" @click="likeSong">
+                    <img src="/assets/CorazonColoreado.png" alt="Img Song" width="20" height="20" v-else @click="likeSong">
                 </div>
             </div>
         </div>
@@ -24,31 +24,31 @@
             <!-- Inicio Botones -->
             <div class="flex items-center justify-center">
                 <div class="mr-6">
-                    <img src="assets/Suffle.png" alt="Shuffle button" width="20" height="20" v-if="!shuffle" @click="shuffleToggle">
-                    <img src="assets/SuffleActivado.png" alt="Shuffle button" width="20" height="20" v-else @click="shuffleToggle">
+                    <img src="/assets/Suffle.png" alt="Shuffle button" width="20" height="20" v-if="!shuffle" @click="shuffleToggle">
+                    <img src="/assets/SuffleActivado.png" alt="Shuffle button" width="20" height="20" v-else @click="shuffleToggle">
                     <!-- <i class="icon ion-ios-shuffle" ></i> -->
                 </div>
 
                 <div class="mr-6">
-                    <img src="assets/SkipBackward.png" alt="Skip Backward button" width="20" height="20" @click="skip('backward')">
+                    <img src="/assets/SkipBackward.png" alt="Skip Backward button" width="20" height="20" @click="skip('backward')">
                     <!-- <i class="icon ion-ios-skip-backward" @click="skip('backward')"></i> -->
                 </div>
 
                 <div class="">
-                    <img src="assets/Play.png" alt="Shuffle button" width="35" height="35" v-if="!isPlaying" @click="playCurrentSong">
+                    <img src="/assets/Play.png" alt="Shuffle button" width="35" height="35" v-if="!isPlaying" @click="playCurrentSong">
                     <!-- <i class="icon ion-ios-play" v-if="!isPlaying" @click="playCurrentSong"></i> -->
-                    <img src="assets/Pause.png" alt="Shuffle button" width="35" height="35" v-else @click="pause">
+                    <img src="/assets/Pause.png" alt="Shuffle button" width="35" height="35" v-else @click="pause">
                     <!-- <i class="icon ion-ios-pause" v-else @click="pause"></i> -->
                 </div>
 
                 <div class="ml-6">
-                    <img src="assets/SkipForward.png" alt="Skip Forward button" width="20" height="20" @click="skip('forward')">
+                    <img src="/assets/SkipForward.png" alt="Skip Forward button" width="20" height="20" @click="skip('forward')">
                     <!-- <i class="icon ion-ios-skip-forward" @click="skip('forward')"></i> -->
                 </div>
 
                 <div class="flex ml-6">
-                    <img src="assets/Repeat.png" alt="Shuffle button" width="20" height="20" v-if="!onRepeat" @click="repeat">
-                    <img src="assets/RepeatActivado.png" alt="Shuffle button" width="20" height="20" v-else @click="repeat">
+                    <img src="/assets/Repeat.png" alt="Shuffle button" width="20" height="20" v-if="!onRepeat" @click="repeat">
+                    <img src="/assets/RepeatActivado.png" alt="Shuffle button" width="20" height="20" v-else @click="repeat">
                     <div class="repeat-info h-3.5 w-3.5 rounded-full text-center text-white capitalize tracking-wide" v-if="onRepeat">{{loop.value}}</div>
                     <!-- <i class="icon ion-ios-repeat" @click="repeat"></i> -->
                 </div>
@@ -77,8 +77,8 @@
         </div>
 
         <div class="flex items-center mr-4">
-            <img src="assets/Mute.png" alt="Shuffle button" class="mr-2" width="20" height="20" v-if="volume == 0" @click="mute">
-            <img src="assets/Volume.png" alt="Shuffle button" class="mr-2" width="20" height="20" v-else @click="mute">
+            <img src="/assets/Mute.png" alt="Shuffle button" class="mr-2" width="20" height="20" v-if="volume == 0" @click="mute">
+            <img src="/assets/Volume.png" alt="Shuffle button" class="mr-2" width="20" height="20" v-else @click="mute">
 
             <div class="overflow-hidden w-20 h-1 flex rounded gray-color">
                 <div :style="{width: volume + '%'}" class="bg-white"></div>
@@ -103,7 +103,7 @@ export default {
             },
 
             defaultSong:
-                "music/AnotherOneBitesTheDust.mp3",
+                "/music/AnotherOneBitesTheDust.mp3",
             isLoaded: false,
             isCurrentlyPlaying: "",
 

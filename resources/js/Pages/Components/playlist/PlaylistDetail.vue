@@ -2,11 +2,11 @@
     <div class="scroll flex flex-col bg-black">
         <div class="p-10 flex flex-row">
             <div>
-                <img :src="require('/music/AnotherOneBitesTheDust.jpg').default" alt="" srcset="" class="h-48 w-48">
+                <img :src="playlists.url_image" alt="" srcset="" class="h-48 w-48">
             </div>
             <div class="ml-8 flex flex-col h-48 ">
                 <p class="text-white text-blond text-base">PLAYLIST</p>
-                <p class="text-white text-blond text-5xl">Another One Bites The Dust</p>
+                <p class="text-white text-blond text-5xl">{{playlists.name}}</p>
             </div>   
         </div>
         <div class="flex flex-col ">
@@ -48,68 +48,37 @@
                                     </tr>
                                 </thead>
                                 <tbody class="bg-black divide-y divide-gray-800">
-                                    <tr>
+                                    <tr v-for="song of playlists.songs" :key="song.id">
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-white text-opacity-75">
-                                            1
+                                            {{song.id}}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                              <div class="flex items-center">
                                                 <div class="flex-shrink-0 h-10 w-10">
-                                                    <img class="h-10 w-10 rounded-full" :src="require('/music/AnotherOneBitesTheDust.jpg').default" alt="">
+                                                    <img class="h-10 w-10 rounded-full" :src="song.url_image" alt="">
                                                 </div>
                                                 <div class="ml-4">
                                                     <div class="text-sm text-blond font-medium text-white ">
-                                                        Jane Cooper
+                                                        {{song.title}}
                                                     </div>
                                                     <div class="text-sm text-white text-opacity-75">
-                                                        jane.cooper@example.com
+                                                        {{song.artist}}
                                                     </div>
                                                 </div>
                                                 </div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-white text-opacity-75">Regional Paradigm Technician</div>
-                                            <div class="text-sm text-white text-opacity-75">Optimization</div>
+                                            <div class="text-sm text-white text-opacity-75">{{song.album}}</div>
+                                            <!-- <div class="text-sm text-white text-opacity-75">Optimization</div> -->
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-white text-opacity-75">
-                                            Prueba
+                                            {{song.created_at}}
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-white text-opacity-75">
-                                            Admin
+                                            2:30
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-white text-opacity-75">
-                                            1
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                             <div class="flex items-center">
-                                                <div class="flex-shrink-0 h-10 w-10">
-                                                    <img class="h-10 w-10 rounded-full" :src="require('/music/AnotherOneBitesTheDust.jpg').default" alt="">
-                                                </div>
-                                                <div class="ml-4">
-                                                    <div class="text-sm text-blond font-medium text-white ">
-                                                        Jane Cooper
-                                                    </div>
-                                                    <div class="text-sm text-white text-opacity-75">
-                                                        jane.cooper@example.com
-                                                    </div>
-                                                </div>
-                                                </div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-white text-opacity-75">Regional Paradigm Technician</div>
-                                            <div class="text-sm text-white text-opacity-75">Optimization</div>
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-white text-opacity-75">
-                                            Prueba
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-white text-opacity-75">
-                                            Admin
-                                        </td>
-                                    </tr>
-
-                           
+                                    
                                 </tbody>
                             </table>
                         </div>
@@ -122,7 +91,10 @@
 
 <script>
 export default {
-    name:'PlaylistDetail'
+    name:'PlaylistDetail',
+    props: {
+        playlists: Object
+    }
 }
 </script>
 
