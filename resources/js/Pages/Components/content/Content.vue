@@ -33,11 +33,11 @@
             <div class="list-songs m-4">
                 <div class="wrap-song">
                     <div class="wrap-img-song">
-                        <img src="" alt="image" srcset="" />
+                        <img src="/music/Desvelado.jpg" alt="image" srcset="" />
                     </div>
                     <div class="wrap-text-song">
-                        <h1 class="font-semibold color-white">Name song</h1>
-                        <p class="font-thin color-white">Yeahhh Yeah</p>
+                        <h1 class="font-semibold color-white">Desvelado</h1>
+                        <p class="font-thin color-white">Bobby Pulido</p>
                     </div>
                 </div>
             </div>
