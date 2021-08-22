@@ -56,7 +56,7 @@
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <Link :href="route('login')" class="underline text-sm text-gray-600 hover:text-gray-900 text-white">
+                <Link :href="route('login')" class="underline text-sm hover:text-gray-900 text-white">
                     ¿Ya tienes cuenta?
                 </Link>
 
